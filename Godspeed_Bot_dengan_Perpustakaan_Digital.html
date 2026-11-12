@@ -1,0 +1,1689 @@
+<!DOCTYPE html>
+<html lang="id" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Godspeed Bot — WhatsApp Bot Multifungsi</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        darkBg: '#0b0f17',
+                        cardBg: '#131926',
+                        cardBorder: '#1f293d',
+                        accentYellow: '#eab308',
+                        accentGreen: '#10b981',
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+    <!-- Google Font Inter & Lucide Icons -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #080c14;
+            color: #f3f4f6;
+            background-image: 
+                radial-gradient(circle at 50% 0%, rgba(234, 179, 8, 0.05) 0%, transparent 50%),
+                linear-gradient(to bottom, rgba(255,255,255,0.02) 1px, transparent 1px),
+                linear-gradient(to right, rgba(255,255,255,0.02) 1px, transparent 1px);
+            background-size: 100% 100%, 30px 30px, 30px 30px;
+        }
+        /* Custom scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #080c14;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #1f293d;
+            border-radius: 4px;
+        }
+        .glow-effect {
+            box-shadow: 0 0 25px -5px rgba(234, 179, 8, 0.15);
+        }
+        .glow-green {
+            box-shadow: 0 0 15px rgba(16, 185, 129, 0.3);
+        }
+        @keyframes rgbGlow {
+            0% { text-shadow: 0 0 8px rgba(255, 0, 0, 0.8); color: #ff4d4d; }
+            20% { text-shadow: 0 0 8px rgba(255, 165, 0, 0.8); color: #ffa64d; }
+            40% { text-shadow: 0 0 8px rgba(0, 255, 128, 0.8); color: #4dff88; }
+            60% { text-shadow: 0 0 8px rgba(0, 204, 255, 0.8); color: #4dd2ff; }
+            80% { text-shadow: 0 0 8px rgba(204, 51, 255, 0.8); color: #e14dff; }
+            100% { text-shadow: 0 0 8px rgba(255, 0, 0, 0.8); color: #ff4d4d; }
+        }
+        .animate-rgb {
+            animation: rgbGlow 4s linear infinite;
+            font-weight: 900;
+        }
+
+        /* Animation for falling stars background */
+        @keyframes fallStar {
+            0% {
+                transform: translateY(-20px) scale(0.5);
+                opacity: 0;
+            }
+            20% {
+                opacity: 0.8;
+            }
+            80% {
+                opacity: 0.8;
+            }
+            100% {
+                transform: translateY(100vh) scale(1);
+                opacity: 0;
+            }
+        }
+
+        .star {
+            position: fixed;
+            top: -10px;
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: 0;
+            animation: fallStar linear infinite;
+        }
+
+        /* Lapisan efek pasir pelangi, bintang kecil, dan daun jatuh.
+           Hanya dekorasi transparan; background asli tetap terlihat. */
+        #rainbowParticles {
+            position: fixed;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 1;
+            opacity: .9;
+        }
+
+        /* ===== Music Player ===== */
+        .music-btn .music-eq{position:absolute;right:3px;bottom:3px;display:none;gap:1.5px;align-items:flex-end;height:8px}
+        .music-btn.playing .music-eq{display:flex}
+        .music-btn.playing .music-note{opacity:.55}
+        .music-eq i{display:block;width:2px;background:#34d399;border-radius:1px;animation:eqBar .9s ease-in-out infinite}
+        .music-eq i:nth-child(2){animation-delay:.2s}.music-eq i:nth-child(3){animation-delay:.4s}
+        @keyframes eqBar{0%,100%{height:2px}50%{height:8px}}
+        #musicOverlay{position:fixed;inset:0;z-index:60;display:flex;align-items:flex-end;justify-content:center;background:rgba(0,0,0,.65);backdrop-filter:blur(6px);opacity:0;pointer-events:none;transition:opacity .25s}
+        #musicOverlay.open{opacity:1;pointer-events:auto}
+        .mp-sheet{width:100%;max-width:440px;max-height:92vh;display:flex;flex-direction:column;overflow:hidden;border:1px solid rgba(255,255,255,.07);border-radius:28px 28px 0 0;
+            background:radial-gradient(120% 60% at 50% 0%,rgba(16,185,129,.20) 0%,transparent 60%),linear-gradient(180deg,#0c1814 0%,#070b09 100%);
+            box-shadow:0 -20px 60px rgba(0,0,0,.6);transform:translateY(40px);transition:transform .3s cubic-bezier(.2,.8,.2,1)}
+        #musicOverlay.open .mp-sheet{transform:translateY(0)}
+        @media(min-width:640px){#musicOverlay{align-items:center}.mp-sheet{border-radius:28px;max-height:86vh}}
+        .mp-head{display:flex;align-items:center;gap:14px;padding:22px 22px 18px;border-bottom:1px solid rgba(255,255,255,.06);background:linear-gradient(180deg,rgba(16,185,129,.09),transparent)}
+        .mp-logo{width:48px;height:48px;border-radius:14px;background:rgba(16,185,129,.16);border:1px solid rgba(16,185,129,.28);display:flex;align-items:center;justify-content:center;color:#34d399;flex-shrink:0}
+        .mp-title{font-size:20px;font-weight:800;color:#fff;line-height:1.1}
+        .mp-sub{font-size:13px;color:#9a9094;margin-top:3px}
+        .mp-close{margin-left:auto;width:44px;height:44px;border-radius:50%;background:rgba(255,255,255,.07);color:#aaa;display:flex;align-items:center;justify-content:center;transition:.2s;flex-shrink:0}
+        .mp-close:hover{background:rgba(255,255,255,.14);color:#fff}
+        .mp-listhead{display:flex;justify-content:space-between;padding:18px 22px 10px;font-size:11px;font-weight:700;letter-spacing:.12em;color:#8a8084;text-transform:uppercase}
+        .mp-list{flex:1;overflow-y:auto;padding:0 14px 10px;min-height:120px}
+        .mp-list::-webkit-scrollbar{width:4px}.mp-list::-webkit-scrollbar-thumb{background:#1f3b30}
+        .mp-item{display:flex;align-items:center;gap:16px;width:100%;text-align:left;padding:12px 10px;border-radius:14px;transition:background .2s}
+        .mp-item:hover{background:rgba(255,255,255,.04)}
+        .mp-item.active{background:rgba(255,255,255,.07)}
+        .mp-num{width:26px;font-family:ui-monospace,Menlo,monospace;font-size:13px;color:#6f666a;flex-shrink:0;text-align:center}
+        .mp-item.active .mp-num{color:#34d399}
+        .mp-name{font-size:15px;font-weight:600;color:#f1eaec;line-height:1.3}
+        .mp-artist{font-size:12.5px;color:#8f8589;margin-top:2px}
+        .mp-now{border-top:1px solid rgba(255,255,255,.06);padding:16px 22px 20px;background:rgba(0,0,0,.25)}
+        .mp-nowrow{display:flex;align-items:center;gap:14px}
+        .mp-cover{width:52px;height:52px;border-radius:14px;background:rgba(16,185,129,.14);border:1px solid rgba(16,185,129,.28);display:flex;align-items:center;justify-content:center;flex-shrink:0;gap:3px}
+        .mp-cover i{display:block;width:3px;border-radius:2px;background:#34d399;height:10px}
+        .mp-cover i:nth-child(2){height:22px}.mp-cover i:nth-child(3){height:16px}.mp-cover i:nth-child(4){height:26px}.mp-cover i:nth-child(5){height:12px}
+        .mp-cover.playing i{animation:eqBar2 .9s ease-in-out infinite}
+        .mp-cover.playing i:nth-child(2){animation-delay:.15s}.mp-cover.playing i:nth-child(3){animation-delay:.3s}.mp-cover.playing i:nth-child(4){animation-delay:.45s}.mp-cover.playing i:nth-child(5){animation-delay:.6s}
+        @keyframes eqBar2{0%,100%{transform:scaleY(.4)}50%{transform:scaleY(1)}}
+        .mp-nname{font-size:15px;font-weight:700;color:#fff;line-height:1.3}
+        .mp-nartist{font-size:13px;color:#9a9094;margin-top:2px}
+        .mp-bar{position:relative;height:4px;background:rgba(255,255,255,.12);border-radius:4px;margin-top:18px;cursor:pointer}
+        .mp-bar::before{content:"";position:absolute;inset:-10px 0}
+        .mp-fill{height:100%;width:0;background:#34d399;border-radius:4px}
+        .mp-times{display:flex;justify-content:space-between;font-family:ui-monospace,Menlo,monospace;font-size:12px;color:#7d7377;margin-top:10px}
+        .mp-ctrl{display:flex;align-items:center;justify-content:center;gap:34px;margin-top:10px}
+        .mp-ctrl button{color:#e9e2e4;display:flex;align-items:center;justify-content:center;transition:.2s}
+        .mp-ctrl button:hover{color:#fff;transform:scale(1.08)}
+        .mp-play{width:74px;height:74px;border-radius:50%;background:rgba(16,185,129,.16);border:1px solid rgba(16,185,129,.40)}
+        .mp-msg{text-align:center;font-size:12px;color:#fbbf24;min-height:16px;margin-top:6px}
+        .mp-add{padding:12px 18px 14px;border-top:1px solid rgba(255,255,255,.06);display:grid;gap:7px;background:rgba(0,0,0,.16)}
+        .mp-addtitle{font-size:11px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:#34d399;margin-bottom:2px}
+        .mp-add input{width:100%;min-width:0;padding:9px 11px;border-radius:9px;border:1px solid rgba(255,255,255,.10);background:#101914;color:#f3f4f6;font-size:12px;outline:none}
+        .mp-add input:focus{border-color:rgba(52,211,153,.65)}
+        .mp-add button{padding:10px;border-radius:10px;background:#065f46;color:#ecfdf5;font-size:12px;font-weight:800}
+        .mp-add button:hover{background:#047857}
+        .mp-addhint{font-size:10px;line-height:1.45;color:#8f9b94}
+        .mp-empty{padding:25px 12px;text-align:center;color:#8f8589;font-size:13px;line-height:1.6}
+        @media(min-width:640px){.mp-add{padding:10px 18px}}
+        
+        /* Stylings untuk Tombol Impor File Perangkat Local */
+        .mp-file-btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            width: 100%;
+            padding: 10px;
+            margin-top: 6px;
+            border-radius: 10px;
+            background: linear-gradient(135deg, rgba(16,185,129,0.15), rgba(5,150,105,0.25));
+            border: 1px dashed rgba(52,211,153,0.5);
+            color: #34d399;
+            font-size: 12px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        .mp-file-btn:hover {
+            background: linear-gradient(135deg, rgba(16,185,129,0.25), rgba(5,150,105,0.35));
+            border-color: #34d399;
+            color: #fff;
+            box-shadow: 0 0 12px rgba(52,211,153,0.2);
+        }
+
+
+        /* ===== Godspeed Sticker Pack ===== */
+        #stickerModal{position:fixed;inset:0;z-index:80;display:none;align-items:center;justify-content:center;padding:16px;background:rgba(0,0,0,.82);backdrop-filter:blur(8px)}
+        #stickerModal.open{display:flex}
+        .sticker-panel{width:100%;max-width:900px;max-height:92vh;overflow:auto;background:#0e1521;border:1px solid #293449;border-radius:22px;box-shadow:0 25px 80px rgba(0,0,0,.6)}
+        .sticker-card{min-width:0;border:1px solid #273247;background:#121b29;border-radius:15px;padding:10px;display:flex;flex-direction:column;gap:8px}
+        .sticker-preview{width:100%;aspect-ratio:1;display:grid;place-items:center;border-radius:11px;background:linear-gradient(45deg,#1b2534 25%,transparent 25%),linear-gradient(-45deg,#1b2534 25%,transparent 25%),linear-gradient(45deg,transparent 75%,#1b2534 75%),linear-gradient(-45deg,transparent 75%,#1b2534 75%);background-size:16px 16px;background-position:0 0,0 8px,8px -8px,-8px 0;overflow:hidden}
+        .sticker-preview img{width:100%;height:100%;object-fit:contain}
+        .sticker-action{border:1px solid #344158;background:#1b2738;border-radius:9px;padding:8px 9px;font-size:11px;font-weight:700;color:#e5edf8}
+        .sticker-action:hover{background:#26364d}
+        .sticker-action.primary{background:#065f46;border-color:#047857;color:#d1fae5}
+        .sticker-action.danger{color:#fca5a5}
+        #stickerAdminPanel{display:none}
+
+        /* ===== Perpustakaan Digital ===== */
+        #libraryModal{position:fixed;inset:0;z-index:90;display:none;align-items:center;justify-content:center;padding:14px;background:rgba(0,0,0,.84);backdrop-filter:blur(9px)}
+        #libraryModal.open{display:flex}
+        .library-panel{width:100%;max-width:1050px;height:min(92vh,850px);display:flex;flex-direction:column;overflow:hidden;background:#0e1521;border:1px solid #293449;border-radius:22px;box-shadow:0 25px 80px rgba(0,0,0,.65)}
+        .library-head{display:flex;align-items:center;gap:12px;padding:17px 20px;border-bottom:1px solid #263247;background:linear-gradient(120deg,rgba(16,185,129,.12),transparent)}
+        .library-content{padding:18px;overflow:auto;flex:1}
+        .library-book{border:1px solid #293449;background:#121b29;border-radius:15px;overflow:hidden;display:flex;flex-direction:column;min-width:0}
+        .library-cover{height:145px;display:flex;align-items:center;justify-content:center;text-align:center;padding:14px;background:linear-gradient(145deg,#173b36,#111827 70%);color:#d1fae5;font-weight:900;font-family:Georgia,serif;font-size:19px;letter-spacing:.02em}
+        .library-book:nth-child(2n) .library-cover{background:linear-gradient(145deg,#42235e,#17152a 75%);color:#f5d0fe}
+        .library-book:nth-child(3n) .library-cover{background:linear-gradient(145deg,#66521a,#191b25 75%);color:#fef3c7}
+        .library-reader{position:fixed;inset:0;z-index:95;display:none;align-items:center;justify-content:center;padding:12px;background:rgba(0,0,0,.92)}
+        .library-reader.open{display:flex}
+        .reader-panel{width:100%;max-width:1000px;height:94vh;display:flex;flex-direction:column;background:#101722;border:1px solid #334155;border-radius:18px;overflow:hidden}
+        .reader-toolbar{display:flex;align-items:center;gap:8px;flex-wrap:wrap;padding:12px;background:#121b29;border-bottom:1px solid #293449}
+        .reader-toolbar button,.library-action{border:1px solid #344158;background:#1b2738;color:#e5edf8;border-radius:9px;padding:8px 11px;font-size:12px;font-weight:700}
+        .reader-toolbar button:disabled{opacity:.35;cursor:not-allowed}
+        .reader-page-area{flex:1;overflow:auto;display:flex;justify-content:center;align-items:flex-start;padding:16px;background:#080c14}
+        #libraryPdfCanvas{max-width:100%;height:auto;background:white;box-shadow:0 8px 35px #0008}
+        .reader-page-input{width:68px;padding:8px;border-radius:8px;background:#080c14;border:1px solid #344158;color:white;text-align:center}
+        .library-muted{font-size:11px;color:#94a3b8;line-height:1.5}
+        @media(max-width:600px){.library-panel{height:96vh;border-radius:16px}.library-content{padding:12px}.library-cover{height:120px;font-size:16px}.reader-panel{height:97vh}.reader-toolbar{gap:6px;padding:9px}.reader-toolbar button{padding:7px 8px}}
+
+    </style>
+</head>
+<body class="min-h-screen pb-16 antialiased selection:bg-yellow-500 selection:text-black relative overflow-x-hidden">
+    <div id="starsContainer" class="fixed inset-0 pointer-events-none z-0 overflow-hidden"></div>
+    <canvas id="rainbowParticles" aria-hidden="true"></canvas>
+
+    <!-- Header / Navbar -->
+    <header class="sticky top-0 z-40 backdrop-blur-xl bg-opacity-80 bg-[#080c14]/80 border-b border-gray-800/60">
+        <div class="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between">
+            <a href="#beranda" class="text-2xl font-black tracking-tight text-white"><span class="animate-rgb">Godspeed Bot</span></a>
+            <div class="flex items-center gap-3">
+                <button id="musicBtn" type="button" aria-label="Buka music player" class="music-btn relative p-2 rounded-xl bg-gray-900 border border-gray-800 text-emerald-400 hover:text-emerald-300 hover:bg-gray-800 transition focus:outline-none focus:ring-2 focus:ring-emerald-500">
+                    <svg viewBox="0 0 24 24" class="w-5 h-5 music-note" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>
+                    <span class="music-eq" aria-hidden="true"><i></i><i></i><i></i></span>
+                </button>
+                <a href="#beranda" class="hidden sm:inline-flex items-center gap-2 rounded-xl bg-gray-900 border border-gray-800 px-4 py-2 text-xs font-bold text-gray-200 hover:border-emerald-500/40 hover:text-emerald-300 transition">
+                    <i data-lucide="layout-dashboard" class="w-4 h-4 text-emerald-400"></i> Dashboard
+                </a>
+                <button id="menuBtn" type="button" aria-label="Buka menu" aria-expanded="false" class="p-2 rounded-xl bg-gray-900 border border-gray-800 text-gray-300 hover:text-white hover:bg-gray-800 transition focus:outline-none focus:ring-2 focus:ring-yellow-500">
+                    <i data-lucide="menu" class="w-5 h-5"></i>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Nav Menu Dropdown (Pojok Kanan Atas) -->
+    <nav id="menuDropdown" class="hidden fixed top-[72px] right-4 sm:right-[calc((100vw-896px)/2)] z-50 w-72 rounded-2xl border border-gray-700 bg-[#121824] p-3 shadow-2xl space-y-1" aria-label="Menu utama">
+        <!-- Pilihan Log Pembaruan v2.3.1 -->
+        <button id="openUpdateBtn" type="button" class="w-full text-left rounded-xl px-3 py-2.5 text-xs font-bold text-emerald-400 bg-emerald-950/50 hover:bg-emerald-900/60 border border-emerald-500/40 transition flex items-center justify-between">
+            <span>📢 Log Pembaruan (v2.3.1)</span>
+            <span class="bg-emerald-500/20 px-1.5 py-0.5 rounded text-[10px]">BARU</span>
+        </button>
+
+        <!-- Pilihan Asli yang Dipertahankan -->
+        <a href="#premium" class="block rounded-xl px-3 py-2.5 text-xs font-semibold text-gray-200 hover:bg-gray-800 hover:text-yellow-400 transition">Paket Premium</a>
+        <a href="#ringkasan" class="block rounded-xl px-3 py-2.5 text-xs font-semibold text-gray-200 hover:bg-gray-800 hover:text-yellow-400 transition">Ringkasan Pesan Bot</a>
+        <a href="#fitur" class="block rounded-xl px-3 py-2.5 text-xs font-semibold text-gray-200 hover:bg-gray-800 hover:text-yellow-400 transition">Fitur Bot</a>
+        <button id="openStickerMenu" type="button" class="w-full text-left rounded-xl px-3 py-2.5 text-xs font-semibold text-gray-200 hover:bg-gray-800 hover:text-yellow-400 transition">🧩 Galeri Sticker Pack</button>
+        <a href="#panduan" class="block rounded-xl px-3 py-2.5 text-xs font-semibold text-gray-200 hover:bg-gray-800 hover:text-yellow-400 transition">Panduan Penggunaan</a>
+        <a href="#faq" class="block rounded-xl px-3 py-2.5 text-xs font-semibold text-gray-200 hover:bg-gray-800 hover:text-yellow-400 transition">Pertanyaan Umum</a>
+    </nav>
+
+    <!-- Modal Pop-up Log Pembaruan Versi 2.3.1 -->
+    <div id="updateModal" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-md p-4">
+        <div class="bg-[#121824] border border-gray-700 rounded-2xl max-w-lg w-full p-6 shadow-2xl relative max-h-[90vh] overflow-y-auto">
+            <button id="closeUpdateBtn" type="button" class="absolute top-4 right-4 text-gray-400 hover:text-white p-1 rounded-lg bg-gray-800/50 hover:bg-gray-800 transition">
+                <i data-lucide="x" class="w-5 h-5"></i>
+            </button>
+            
+            <div class="flex items-center gap-2 mb-3">
+                <span class="bg-purple-500/20 text-purple-300 text-xs px-2.5 py-1 rounded-full font-bold border border-purple-500/30">v2.3.1</span>
+                <span class="bg-emerald-500/20 text-emerald-300 text-xs px-2.5 py-1 rounded-full font-bold border border-emerald-500/30">LOG PEMBARUAN</span>
+            </div>
+
+            <h3 class="text-xl font-extrabold text-white mb-1">Godspeed Bot - Update Per Bulan</h3>
+            <p class="text-xs text-gray-400 leading-relaxed mb-4">
+                <strong class="text-gray-200">Tentang Godspeed Bot:</strong><br>
+                Godspeed Bot adalah asisten virtual WhatsApp serbaguna yang dirancang untuk membantu Anda mengelola grup, mengotomatisasi interaksi, hingga menikmati berbagai fitur hiburan dan utilitas dengan mudah langsung dari chat WhatsApp.
+            </p>
+
+            <div class="space-y-4 bg-gray-900/90 p-4 rounded-xl border border-gray-800 text-xs">
+                <div>
+                    <h4 class="font-bold text-yellow-400 uppercase tracking-wider mb-2 flex items-center gap-1.5">
+                        <i data-lucide="terminal" class="w-4 h-4"></i> Cara Penggunaan & Contoh Perintah:
+                    </h4>
+                    <p class="text-gray-400 mb-2">Untuk mulai menggunakan bot, cukup ketik perintah (command) diawal chat dengan format tertentu:</p>
+                    <ol class="space-y-2 text-gray-300 list-decimal list-inside pl-1">
+                        <li><strong class="text-white">Menu Utama:</strong> Ketik <code class="text-emerald-300 bg-gray-800 px-1 py-0.5 rounded">.menu</code> atau <code class="text-emerald-300 bg-gray-800 px-1 py-0.5 rounded">.help</code> untuk menampilkan seluruh daftar perintah yang tersedia.</li>
+                        <li><strong class="text-white">Manajemen Grup:</strong> Ketik <code class="text-blue-300 bg-gray-800 px-1 py-0.5 rounded">.kick [nomor/tag]</code> atau <code class="text-blue-300 bg-gray-800 px-1 py-0.5 rounded">.add</code> untuk mengelola anggota grup secara instan (memerlukan izin admin).</li>
+                        <li><strong class="text-white">Fitur Interaktif & Hiburan:</strong> Ketik <code class="text-yellow-300 bg-gray-800 px-1 py-0.5 rounded">.game</code> atau perintah mini-games lainnya untuk memulai permainan seru bersama anggota grup.</li>
+                        <li><strong class="text-white">Pencarian & Utilitas:</strong> Ketik <code class="text-purple-300 bg-gray-800 px-1 py-0.5 rounded">.sticker</code> untuk membuat stiker otomatis atau perintah utilitas lainnya sesuai kebutuhan Anda.</li>
+                    </ol>
+                </div>
+
+                <div class="border-t border-gray-800 pt-3">
+                    <h4 class="font-bold text-emerald-400 uppercase tracking-wider mb-2 flex items-center gap-1.5">
+                        <i data-lucide="sparkles" class="w-4 h-4"></i> Pembaruan Versi (v2.3.1):
+                    </h4>
+                    <ul class="space-y-2 text-gray-300 list-disc list-inside pl-1">
+                        <li><strong class="text-white">Optimasi Perintah Grup:</strong> Peningkatan kecepatan respons secara signifikan untuk perintah moderasi dan pengelolaan grup secara real-time.</li>
+                        <li><strong class="text-white">Penyempurnaan Antarmuka Menu:</strong> Perbaikan tata letak navigasi menu interaktif agar tampil lebih rapi dan mudah diakses.</li>
+                        <li><strong class="text-white">Perbaikan Bug Sistem:</strong> Mengatasi kendala tertundanya pengiriman pesan otomatis pada beberapa skenario interaksi tertentu.</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Pemberitahuan pertandingan sepak bola -->
+            <section class="mt-5 rounded-xl border border-emerald-500/30 bg-emerald-950/20 p-4 space-y-3">
+                <div class="flex items-center justify-between gap-2">
+                    <h4 class="font-extrabold text-emerald-300 text-sm">⚽ Pemberitahuan Bola</h4>
+                    <span id="footballNotifyStatus" class="text-[10px] text-gray-400">Belum diaktifkan</span>
+                </div>
+                <p class="text-xs text-gray-400">Aktifkan notifikasi browser untuk menerima pengingat pertandingan 15 menit sebelum kick-off dan pembaruan jadwal/skor saat sumber data tersedia.</p>
+                <button id="enableFootballNotifications" type="button" class="w-full rounded-lg bg-emerald-500 hover:bg-emerald-400 text-black font-bold text-xs py-2.5">Aktifkan Pemberitahuan Bola</button>
+                <p class="text-[10px] text-gray-500">Pantauan: Liga 1, Timnas Indonesia, Premier League, La Liga, Serie A, UCL, dan laga internasional. Notifikasi memerlukan izin browser serta koneksi internet.</p>
+            </section>
+
+            <p class="text-[11px] text-gray-400 mt-4 text-center leading-relaxed">
+                Kami terus meningkatkan kualitas Godspeed Bot setiap bulan demi kelancaran aktivitas Anda. Cek menu "Log Pembaruan" untuk melihat riwayat rilis lengkap sebelumnya!
+            </p>
+        </div>
+    </div>
+
+    <main id="beranda" class="relative z-10 max-w-4xl mx-auto px-4 pt-7 space-y-7">
+        <!-- Hero: tetap sesuai kode asli user -->
+        <section class="space-y-5 text-center max-w-4xl mx-auto py-2 sm:py-5">
+            <div class="inline-flex items-center gap-2 bg-emerald-950/60 border border-emerald-500/40 text-emerald-400 text-xs px-3 py-1 rounded-full font-semibold">
+                <span class="h-2 w-2 rounded-full bg-emerald-400"></span>
+                BOT WHATSAPP MULTIFUNGSI
+            </div>
+            <h1 class="text-3xl sm:text-5xl font-black text-white tracking-tight leading-tight">
+                Bot WhatsApp <span class="animate-rgb">Godspeed Bot</span>
+            </h1>
+            <p class="text-gray-400 text-sm sm:text-base max-w-2xl leading-relaxed mx-auto">
+                Bot WhatsApp multifungsi dengan fitur lengkap: unduhan media sosial, pembuat stiker, manajemen grup, dan berbagai permainan interaktif. Tersedia fitur gratis dan premium yang terjangkau!
+            </p>
+            <div class="flex flex-wrap items-center justify-center gap-3 pt-2">
+                <a href="#ringkasan" class="inline-flex items-center justify-center gap-2 rounded-xl bg-yellow-500 hover:bg-yellow-400 px-5 py-3 text-sm font-extrabold text-black transition focus:outline-none focus:ring-2 focus:ring-yellow-300">
+                    <i data-lucide="layout-dashboard" class="w-4 h-4"></i> Buka Dashboard
+                </a>
+                <a href="https://whatsapp.com/channel/0029VamMXWI47Xe4brJoiV0q" class="inline-flex items-center justify-center gap-2 rounded-xl bg-gray-900 border border-gray-800 hover:bg-gray-800 px-5 py-3 text-sm font-extrabold text-gray-100 transition">
+                    <i data-lucide="external-link" class="w-4 h-4"></i> Gabung Channel
+                </a>
+                <a href="#premium" class="inline-flex items-center justify-center gap-2 rounded-xl bg-gray-900 border border-gray-800 hover:border-yellow-500/50 hover:text-yellow-300 px-5 py-3 text-sm font-extrabold text-gray-100 transition">
+                    <i data-lucide="crown" class="w-4 h-4"></i> Paket Premium
+                </a>
+                <a href="#fitur" class="inline-flex items-center justify-center gap-2 rounded-xl px-5 py-3 text-sm font-bold text-gray-400 hover:text-yellow-300 transition">
+                    Jelajahi Fitur <i data-lucide="arrow-down" class="w-4 h-4"></i>
+                </a>
+            </div>
+        </section>
+
+        <section class="bg-gray-900/60 border border-gray-800 rounded-2xl p-4 flex items-start gap-3 text-sm">
+            <span class="bg-yellow-500/10 border border-yellow-500/20 rounded-xl p-2.5 text-yellow-400"><i data-lucide="zap" class="w-5 h-5"></i></span>
+            <div><h2 class="font-bold text-white">Satu bot, banyak fungsi</h2><p class="text-xs sm:text-sm text-gray-400 mt-1 leading-relaxed">Gunakan perintah langsung dari chat WhatsApp. Untuk fitur pengelolaan grup, bot harus berada di grup dan memperoleh izin admin yang sesuai.</p></div>
+        </section>
+
+        <!-- Ringkasan Pesan Bot & Tambahan Tombol Bot WhatsApp Pelangi Berlatar Hitam -->
+        <section id="ringkasan" class="space-y-3 scroll-mt-24">
+            <div class="flex flex-wrap items-end justify-between gap-2">
+                <div><h2 class="text-xl font-extrabold text-white">Ringkasan Pesan Bot</h2><p class="text-xs text-gray-500 mt-1">Contoh tampilan statistik penggunaan</p></div>
+                <div class="flex items-center gap-2">
+                    <button id="openStickerBtn" type="button" class="flex items-center gap-2 rounded-full border border-purple-500/40 bg-purple-950/40 hover:bg-purple-900/60 px-3 py-1.5 text-xs font-bold text-purple-200 transition">
+                        <i data-lucide="sticker" class="w-4 h-4"></i><span>Sticker Pack</span>
+                    </button>
+                    <!-- Tombol Bot WhatsApp Pelangi Berlatar Hitam -->
+                    <button id="openBotConfigBtn" type="button" class="flex items-center gap-2 bg-black hover:bg-gray-950 border border-gray-700 hover:border-gray-500 px-3 py-1.5 rounded-full shadow-lg transition-all transform hover:scale-105 active:scale-95">
+                        <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+                        <span class="text-xs font-black tracking-wide animate-rgb">Bot WhatsApp</span>
+                    </button>
+                    <span class="rounded-full border border-yellow-500/30 bg-yellow-500/10 px-3 py-1 text-[10px] font-bold tracking-wide text-yellow-300">DATA DEMO</span>
+                </div>
+            </div>
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                <article class="bg-[#121824] border border-gray-800/80 p-4 rounded-2xl">
+                    <div class="flex items-center justify-between gap-2"><span class="text-xs text-gray-400">Total pesan 24 jam</span><i data-lucide="messages-square" class="w-5 h-5 text-emerald-400"></i></div>
+                    <div class="mt-3 text-2xl font-black text-white tabular-nums">248.061</div><p class="mt-1 text-[11px] text-gray-500">Contoh jumlah pesan</p>
+                </article>
+                <article class="bg-[#121824] border border-gray-800/80 p-4 rounded-2xl">
+                    <div class="flex items-center justify-between gap-2"><span class="text-xs text-gray-400">Rata-rata per menit</span><i data-lucide="activity" class="w-5 h-5 text-purple-400"></i></div>
+                    <div class="mt-3 text-2xl font-black text-white tabular-nums">172,3</div><p class="mt-1 text-[11px] text-gray-500">Contoh pesan per menit</p>
+                </article>
+                <article class="bg-[#121824] border border-gray-800/80 p-4 rounded-2xl">
+                    <div class="flex items-center justify-between gap-2"><span class="text-xs text-gray-400">Puncak trafik</span><i data-lucide="trending-up" class="w-5 h-5 text-yellow-400"></i></div>
+                    <div class="mt-3 text-2xl font-black text-white tabular-nums">640</div><p class="mt-1 text-[11px] text-gray-500">Contoh pesan per menit</p>
+                </article>
+            </div>
+            <p class="text-[11px] leading-relaxed text-gray-500">Angka di atas hanya ilustrasi tampilan, bukan statistik pemakaian sebenarnya. Data aktual dan pembaruan otomatis akan ditambahkan setelah API/backend bot dihubungkan.</p>
+        </section>
+
+        <!-- Feature cards -->
+        <section id="fitur" class="space-y-4 scroll-mt-24">
+            <div><h2 class="text-xl font-extrabold text-white tracking-tight border-b-2 border-yellow-500 inline-block pb-1">Fitur Godspeed Bot</h2><p class="text-xs text-gray-500 mt-2">Kategori fitur dan contoh perintah bot.</p></div>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <article class="bg-[#121824] border border-gray-800 rounded-2xl p-5 hover:border-emerald-500/40 transition">
+                    <div class="flex items-center gap-3 mb-4"><span class="bg-emerald-500/10 rounded-xl p-3 text-emerald-400"><i data-lucide="download" class="w-6 h-6"></i></span><div><h3 class="font-extrabold text-white">Download Media Sosial</h3><p class="text-[11px] text-gray-500">Unduh media dengan tautan</p></div></div>
+                    <div class="space-y-2 text-xs"><div class="flex justify-between gap-3 rounded-lg bg-gray-900 px-3 py-2"><span class="text-gray-300">TikTok</span><code class="text-emerald-300">.tiktok &lt;url&gt;</code></div><div class="flex justify-between gap-3 rounded-lg bg-gray-900 px-3 py-2"><span class="text-gray-300">Instagram</span><code class="text-emerald-300">.instagram &lt;url&gt;</code></div><div class="flex justify-between gap-3 rounded-lg bg-gray-900 px-3 py-2"><span class="text-gray-300">YouTube</span><code class="text-emerald-300">.youtube &lt;url&gt;</code></div></div>
+                </article>
+                <article class="bg-[#121824] border border-gray-800 rounded-2xl p-5 hover:border-purple-500/40 transition">
+                    <div class="flex items-center gap-3 mb-4"><span class="bg-purple-500/10 rounded-xl p-3 text-purple-400"><i data-lucide="sticker" class="w-6 h-6"></i></span><div><h3 class="font-extrabold text-white">Buat Stiker WhatsApp</h3><p class="text-[11px] text-gray-500">Ubah media menjadi stiker</p></div></div>
+                    <div class="space-y-2 text-xs"><div class="flex justify-between gap-3 rounded-lg bg-gray-900 px-3 py-2"><span class="text-gray-300">Stiker gambar</span><code class="text-purple-300">.sticker</code></div><div class="flex justify-between gap-3 rounded-lg bg-gray-900 px-3 py-2"><span class="text-gray-300">Stiker bergerak</span><code class="text-purple-300">.stickergif</code></div></div>
+                </article>
+                <article class="bg-[#121824] border border-gray-800 rounded-2xl p-5 hover:border-blue-500/40 transition">
+                    <div class="flex items-center gap-3 mb-4"><span class="bg-blue-500/10 rounded-xl p-3 text-blue-400"><i data-lucide="users" class="w-6 h-6"></i></span><div><h3 class="font-extrabold text-white">Kelola Grup</h3><p class="text-[11px] text-gray-500">Perintah administrasi grup</p></div></div>
+                    <div class="space-y-2 text-xs"><div class="flex justify-between gap-3 rounded-lg bg-gray-900 px-3 py-2"><span class="text-gray-300">Keluarkan anggota</span><code class="text-blue-300">.kick @user</code></div><div class="flex justify-between gap-3 rounded-lg bg-gray-900 px-3 py-2"><span class="text-gray-300">Jadikan admin</span><code class="text-blue-300">.promote @user</code></div><div class="flex justify-between gap-3 rounded-lg bg-gray-900 px-3 py-2"><span class="text-gray-300">Turunkan admin</span><code class="text-blue-300">.demote @user</code></div></div>
+                    <p class="mt-3 text-[11px] text-gray-500">Memerlukan izin admin bot di grup.</p>
+                </article>
+                <article class="bg-[#121824] border border-gray-800 rounded-2xl p-5 hover:border-yellow-500/40 transition">
+                    <div class="flex items-center gap-3 mb-4"><span class="bg-yellow-500/10 rounded-xl p-3 text-yellow-400"><i data-lucide="gamepad-2" class="w-6 h-6"></i></span><div><h3 class="font-extrabold text-white">Permainan Interaktif</h3><p class="text-[11px] text-gray-500">Hiburan langsung di chat</p></div></div>
+                    <div class="space-y-2 text-xs"><div class="flex justify-between gap-3 rounded-lg bg-gray-900 px-3 py-2"><span class="text-gray-300">Tebak gambar</span><code class="text-yellow-300">.tebakgambar</code></div><div class="flex justify-between gap-3 rounded-lg bg-gray-900 px-3 py-2"><span class="text-gray-300">Kuis</span><code class="text-yellow-300">.kuis</code></div><div class="flex justify-between gap-3 rounded-lg bg-gray-900 px-3 py-2"><span class="text-gray-300">Tebak kata</span><code class="text-yellow-300">.tebakkata</code></div></div>
+                </article>
+
+                <button type="button" id="openLibraryBtn" class="text-left bg-[#121824] border border-gray-800 rounded-2xl p-5 hover:border-emerald-500/50 transition group sm:col-span-2">
+                    <div class="flex items-center gap-3">
+                        <span class="bg-emerald-500/10 rounded-xl p-3 text-emerald-400 group-hover:bg-emerald-500/20"><i data-lucide="library" class="w-6 h-6"></i></span>
+                        <div class="min-w-0 flex-1"><h3 class="font-extrabold text-white">Perpustakaan Digital</h3><p class="text-[11px] text-gray-500">Buka buku paket, baca halaman, dan ganti koleksi kapan saja</p></div>
+                        <span class="text-emerald-300 text-xs font-bold">Buka Perpus →</span>
+                    </div>
+                    <div class="mt-4 grid grid-cols-2 sm:grid-cols-4 gap-2 text-[11px]">
+                        <span class="rounded-lg bg-gray-900 px-3 py-2 text-gray-300">📘 Buku Bahasa Inggris</span>
+                        <span class="rounded-lg bg-gray-900 px-3 py-2 text-gray-300">📗 Buku Paket</span>
+                        <span class="rounded-lg bg-gray-900 px-3 py-2 text-gray-300">📙 Materi Pelajaran</span>
+                        <span class="rounded-lg bg-gray-900 px-3 py-2 text-gray-300">💾 Tersimpan di browser</span>
+                    </div>
+                </button>
+            </div>
+        </section>
+
+        <!-- Usage guide -->
+        <section id="panduan" class="bg-[#121824] border border-gray-800 rounded-2xl p-5 space-y-4 scroll-mt-24">
+            <div class="flex items-center gap-3"><span class="bg-yellow-500/10 rounded-xl p-2.5 text-yellow-400"><i data-lucide="book-open" class="w-5 h-5"></i></span><div><h2 class="font-extrabold text-white">Panduan Penggunaan</h2><p class="text-xs text-gray-500">Langkah awal menggunakan Godspeed Bot</p></div></div>
+            <ol class="space-y-3 text-sm text-gray-300">
+                <li class="flex gap-3"><span class="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-yellow-500/10 text-xs font-black text-yellow-300">1</span><span>Klik tombol Gabung Channel untuk langsung membuka saluran WhatsApp resmi Godspeed Bot.</span></li>
+                <li class="flex gap-3"><span class="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-yellow-500/10 text-xs font-black text-yellow-300">2</span><span>Tambahkan bot ke grup dengan perintah <code class="text-emerald-300">.join &lt;link grup&gt;</code> melalui chat bot, apabila fitur tersebut telah diaktifkan.</span></li>
+                <li class="flex gap-3"><span class="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-yellow-500/10 text-xs font-black text-yellow-300">3</span><span>Pastikan grup memenuhi ketentuan minimal 30 anggota.</span></li>
+                <li class="flex gap-3"><span class="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-yellow-500/10 text-xs font-black text-yellow-300">4</span><span>Kirim perintah fitur di chat WhatsApp dan ikuti balasan bot. Berikan izin admin hanya untuk fitur grup yang membutuhkannya.</span></li>
+            </ol>
+            <p class="rounded-xl border border-yellow-500/20 bg-yellow-500/5 p-3 text-xs text-gray-400">Catatan: halaman ini adalah tampilan informasi. Perintah, channel, dan proses penambahan bot baru dapat berfungsi setelah backend/API dikonfigurasi.</p>
+        </section>
+
+        <!-- FAQ -->
+        <section id="faq" class="space-y-3 scroll-mt-24">
+            <div><h2 class="text-xl font-extrabold text-white">Pertanyaan Umum (FAQ)</h2><p class="text-xs text-gray-500 mt-1">Informasi singkat seputar bot.</p></div>
+            <details class="bg-[#121824] border border-gray-800 rounded-xl p-4"><summary class="cursor-pointer text-sm font-bold text-white">Bagaimana cara menambahkan bot ke grup?</summary><p class="mt-3 text-xs leading-relaxed text-gray-400">Gunakan perintah .join dengan tautan grup apabila fitur tersebut sudah diaktifkan. Pastikan bot dapat diundang ke grup.</p></details>
+            <details class="bg-[#121824] border border-gray-800 rounded-xl p-4"><summary class="cursor-pointer text-sm font-bold text-white">Apakah Godspeed Bot gratis atau premium?</summary><p class="mt-3 text-xs leading-relaxed text-gray-400">Ketentuan gratis atau premium belum ditetapkan pada halaman ini. Informasi paket dapat ditambahkan setelah sistem bot siap.</p></details>
+            <details class="bg-[#121824] border border-gray-800 rounded-xl p-4"><summary class="cursor-pointer text-sm font-bold text-white">Berapa minimal anggota grup?</summary><p class="mt-3 text-xs leading-relaxed text-gray-400">Panduan awal pada halaman ini mencantumkan minimal 30 anggota grup.</p></details>
+            <details class="bg-[#121824] border border-gray-800 rounded-xl p-4"><summary class="cursor-pointer text-sm font-bold text-white">Apa saja fitur Godspeed Bot?</summary><p class="mt-3 text-xs leading-relaxed text-gray-400">Download media sosial, pembuatan stiker, pengelolaan grup, dan permainan interaktif.</p></details>
+            <details class="bg-[#121824] border border-gray-800 rounded-xl p-4"><summary class="cursor-pointer text-sm font-bold text-white">Di mana melihat daftar perintah?</summary><p class="mt-3 text-xs leading-relaxed text-gray-400">Lihat contoh perintah pada masing-masing kartu fitur di bagian Fitur Godspeed Bot.</p></details>
+            <details class="bg-[#121824] border border-gray-800 rounded-xl p-4"><summary class="cursor-pointer text-sm font-bold text-white">Kenapa bot tidak merespons?</summary><p class="mt-3 text-xs leading-relaxed text-gray-400">Periksa koneksi bot, format perintah, izin grup, dan status server. Jika backend belum terhubung, perintah belum dapat dijalankan.</p></details>
+        </section>
+
+        <footer class="border-t border-gray-800 pt-5 pb-4 text-center space-y-2">
+            <div class="text-sm font-extrabold text-white">Godspeed Bot</div>
+            <p class="text-xs text-gray-500">WhatsApp Bot Multifungsi &amp; Mudah</p>
+            <p class="text-[10px] text-gray-600">© 2026 Godspeed Bot. Tampilan dashboard.</p>
+        </footer>
+    </main>
+
+    <!-- Halaman Paket Premium -->
+    <main id="premiumPage" class="hidden relative z-10 max-w-7xl mx-auto px-4 sm:px-6 pt-8 pb-16 space-y-8">
+        <div class="flex items-center justify-between gap-3">
+            <p class="text-[11px] font-extrabold tracking-[.22em] text-yellow-400 uppercase">Godspeed Bot / Paket Premium</p>
+            <button type="button" id="premiumBackBtn" class="inline-flex items-center gap-2 rounded-xl border border-gray-800 bg-gray-900 px-3 py-2 text-xs font-bold text-gray-200 hover:border-yellow-500/50 hover:text-yellow-300 transition"><i data-lucide="arrow-left" class="w-4 h-4"></i> Dashboard</button>
+        </div>
+        <section id="premium" class="space-y-8 scroll-mt-24 pt-5">
+            <div class="text-center max-w-3xl mx-auto space-y-3">
+                <p class="text-[11px] font-extrabold tracking-[.22em] text-yellow-400 uppercase">Jadibot Profile</p>
+                <h2 class="text-2xl sm:text-3xl font-black text-white">Bot Premium (Jadibot)</h2>
+                <p class="text-sm sm:text-base leading-relaxed text-gray-400">Dapatkan berbagai fitur eksklusif untuk profil jadibot WhatsApp Anda seperti custom menu, custom response, auto read, dan slot bypass.</p>
+                <a href="#premiumBenefits" class="inline-flex items-center justify-center gap-2 mt-2 rounded-xl border border-gray-700 bg-[#121824] hover:bg-gray-800 px-4 py-2.5 text-xs font-bold text-gray-200 transition"><i data-lucide="info" class="w-4 h-4"></i> Lihat Fitur Lengkap &amp; Kelola Profil</a>
+            </div>
+
+            <article class="relative rounded-2xl border-2 border-yellow-500/70 bg-[#121824] p-5 sm:p-7 shadow-[0_0_25px_-5px_rgba(234,179,8,.10)]">
+                <span class="absolute -top-3 right-5 rounded-full bg-yellow-500 px-4 py-1 text-[10px] font-extrabold tracking-wide text-black">PALING POPULER</span>
+                <div class="text-center">
+                    <h3 class="text-lg sm:text-xl font-black text-white">Premium Profile</h3>
+                    <div class="mt-2 font-mono text-3xl sm:text-4xl font-black tracking-tight text-yellow-400">Rp 10.000 - Rp 27.000</div>
+                    <span class="mt-2 inline-flex rounded-lg border border-gray-700 bg-gray-900 px-3 py-1 text-[10px] font-semibold text-gray-400">◎ ≈ USD $0.55</span>
+                    <p class="mt-3 text-sm font-bold text-yellow-400">Max 5 Bot, 2 Slot Bypass</p>
+                </div>
+                <div class="mt-6">
+                    <p class="text-xs font-extrabold tracking-wide text-gray-400">KEUNTUNGAN:</p>
+                    <ul class="mt-3 grid grid-cols-1 sm:grid-cols-3 gap-3 text-sm font-semibold text-gray-300">
+                        <li class="flex items-center gap-2"><span class="text-emerald-400">✓</span> Akses Tanpa Batas</li>
+                        <li class="flex items-center gap-2"><span class="text-emerald-400">✓</span> Buka Semua Fitur Premium</li>
+                        <li class="flex items-center gap-2"><span class="text-emerald-400">✓</span> Dukungan Prioritas 24/7</li>
+                    </ul>
+                </div>
+                <div id="premiumBenefits" class="mt-6 rounded-xl border border-gray-800 bg-gray-900/70 p-4">
+                    <h4 class="text-sm font-extrabold text-white">Fitur Premium Profile</h4>
+                    <p class="mt-2 text-xs leading-relaxed text-gray-400">Custom menu, custom response, auto read, dan slot bypass untuk pengelolaan profil jadibot.</p>
+                </div>
+            </article>
+
+            <div class="border-t border-gray-800 pt-8">
+                <div class="text-center max-w-3xl mx-auto">
+                    <p class="text-[11px] font-extrabold tracking-[.22em] text-yellow-400 uppercase">Pilihan Paket</p>
+                    <h3 class="mt-3 text-2xl sm:text-3xl font-black text-white">Pilih Paket Premium Anda</h3>
+                    <p class="mt-3 text-sm sm:text-base text-gray-400">Tingkatkan pengalaman menggunakan bot dengan paket premium yang terjangkau.</p>
+                </div>
+                <div class="mt-12 text-center">
+                    <p class="text-[11px] font-extrabold tracking-[.2em] text-emerald-400 uppercase">User Subscription</p>
+                    <h4 class="mt-2 text-2xl font-black text-white">Premium Pengguna</h4>
+                    <p class="mt-2 text-sm text-gray-400">Paket premium untuk satu pengguna individual</p>
+                    <a href="#subscriptionPlans" class="inline-flex items-center gap-2 mt-4 rounded-xl border border-gray-700 bg-[#121824] hover:bg-gray-800 px-4 py-2.5 text-xs font-bold text-gray-200 transition"><i data-lucide="info" class="w-4 h-4"></i> Lihat Benefit Lengkap</a>
+                </div>
+                <div id="subscriptionPlans" class="mt-10 grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-5 items-stretch">
+                    <article class="flex flex-col rounded-2xl border border-gray-800 bg-[#121824] p-5 sm:p-6">
+                        <h5 class="text-center text-lg font-black text-white">10 hari</h5><p class="mt-2 text-center font-mono text-3xl font-black text-white">Rp 10.000</p><span class="mx-auto mt-2 rounded-lg border border-gray-700 bg-gray-900 px-3 py-1 text-[10px] text-gray-400">◎ ≈ USD $0.55</span><p class="mt-3 text-center text-sm font-bold text-yellow-400">Akses Penuh &amp; Unlimited</p>
+                        <div class="mt-6"><p class="text-xs font-extrabold text-gray-400">KEUNTUNGAN:</p><ul class="mt-3 space-y-3 text-sm font-semibold text-gray-300"><li>✓ Akses Tanpa Batas</li><li>✓ Buka Semua Fitur Premium</li><li>✓ Dukungan Prioritas 24/7</li></ul></div>
+                        <p class="mt-6 rounded-xl border border-gray-800 bg-gray-900/70 p-3 text-xs text-gray-400">Paket ini hanya berlaku untuk satu pengguna</p><button type="button" class="premium-buy-btn mt-6 w-full rounded-xl border border-gray-700 px-4 py-3 text-sm font-extrabold text-gray-100 hover:bg-gray-800 transition" data-plan="10 hari — Rp 10.000">Beli Sekarang</button>
+                    </article>
+                    <article class="relative flex flex-col rounded-2xl border-2 border-yellow-500/70 bg-[#121824] p-5 sm:p-6">
+                        <span class="absolute -top-3 left-1/2 -translate-x-1/2 whitespace-nowrap rounded-full bg-yellow-500 px-4 py-1 text-[10px] font-extrabold text-black">PALING POPULER</span><h5 class="text-center text-lg font-black text-white">1 Bulan</h5><p class="mt-2 text-center font-mono text-3xl font-black text-yellow-400">Rp 15.000</p><span class="mx-auto mt-2 rounded-lg border border-gray-700 bg-gray-900 px-3 py-1 text-[10px] text-gray-400">◎ ≈ USD $0.83</span><p class="mt-3 text-center text-sm font-bold text-yellow-400">Akses Penuh &amp; Unlimited</p>
+                        <div class="mt-6"><p class="text-xs font-extrabold text-gray-400">KEUNTUNGAN:</p><ul class="mt-3 space-y-3 text-sm font-semibold text-gray-300"><li>✓ Akses Tanpa Batas</li><li>✓ Buka Semua Fitur Premium</li><li>✓ Dukungan Prioritas 24/7</li></ul></div>
+                        <p class="mt-6 rounded-xl border border-gray-800 bg-gray-900/70 p-3 text-xs text-gray-400">Paket ini hanya berlaku untuk satu pengguna</p><button type="button" class="premium-buy-btn mt-6 w-full rounded-xl bg-yellow-500 px-4 py-3 text-sm font-extrabold text-black hover:bg-yellow-400 transition" data-plan="1 Bulan — Rp 15.000">Beli Sekarang</button>
+                    </article>
+                    <article class="flex flex-col rounded-2xl border border-gray-800 bg-[#121824] p-5 sm:p-6">
+                        <h5 class="text-center text-lg font-black text-white">3 Bulan</h5><p class="mt-2 text-center font-mono text-3xl font-black text-white">Rp 40.000</p><span class="mx-auto mt-2 rounded-lg border border-gray-700 bg-gray-900 px-3 py-1 text-[10px] text-gray-400">◎ ≈ USD $2.21</span><p class="mt-3 text-center text-sm font-bold text-yellow-400">Akses Penuh &amp; Unlimited</p>
+                        <div class="mt-6"><p class="text-xs font-extrabold text-gray-400">KEUNTUNGAN:</p><ul class="mt-3 space-y-3 text-sm font-semibold text-gray-300"><li>✓ Akses Tanpa Batas</li><li>✓ Buka Semua Fitur Premium</li><li>✓ Dukungan Prioritas 24/7</li></ul></div>
+                        <p class="mt-6 rounded-xl border border-gray-800 bg-gray-900/70 p-3 text-xs text-gray-400">Paket ini hanya berlaku untuk satu pengguna</p><button type="button" class="premium-buy-btn mt-6 w-full rounded-xl border border-gray-700 px-4 py-3 text-sm font-extrabold text-gray-100 hover:bg-gray-800 transition" data-plan="3 Bulan — Rp 40.000">Beli Sekarang</button>
+                    </article>
+                    <article class="flex flex-col rounded-2xl border border-gray-800 bg-[#121824] p-5 sm:p-6">
+                        <h5 class="text-center text-lg font-black text-white">365 hari</h5><p class="mt-2 text-center font-mono text-3xl font-black text-white">Rp 150.000</p><span class="mx-auto mt-2 rounded-lg border border-gray-700 bg-gray-900 px-3 py-1 text-[10px] text-gray-400">◎ ≈ USD $8.29</span><p class="mt-3 text-center text-sm font-bold text-yellow-400">Akses Penuh &amp; Unlimited</p>
+                        <div class="mt-6"><p class="text-xs font-extrabold text-gray-400">KEUNTUNGAN:</p><ul class="mt-3 space-y-3 text-sm font-semibold text-gray-300"><li>✓ Akses Tanpa Batas</li><li>✓ Buka Semua Fitur Premium</li><li>✓ Dukungan Prioritas 24/7</li></ul></div>
+                        <p class="mt-6 rounded-xl border border-gray-800 bg-gray-900/70 p-3 text-xs text-gray-400">Paket ini hanya berlaku untuk satu pengguna</p><button type="button" class="premium-buy-btn mt-6 w-full rounded-xl border border-gray-700 px-4 py-3 text-sm font-extrabold text-gray-100 hover:bg-gray-800 transition" data-plan="365 hari — Rp 150.000">Beli Sekarang</button>
+                    </article>
+                </div>
+                <p class="mt-6 text-center text-[11px] text-gray-500">Informasi pembelian dan pembayaran akan diaktifkan setelah backend/API disiapkan.</p>
+            </div>
+        </section>
+    </main>
+
+
+    <!-- Perpustakaan Digital: koleksi PDF disimpan di browser -->
+    <div id="libraryModal" aria-hidden="true">
+      <section class="library-panel" role="dialog" aria-modal="true" aria-label="Perpustakaan Digital">
+        <header class="library-head">
+          <span class="rounded-xl p-3 bg-emerald-500/10 text-emerald-300"><i data-lucide="library" class="w-6 h-6"></i></span>
+          <div class="min-w-0"><h2 class="font-extrabold text-white">Perpustakaan Digital</h2><p class="library-muted">Simpan dan baca buku paket PDF langsung di browser</p></div>
+          <button type="button" id="libraryClose" class="ml-auto rounded-xl bg-gray-800 p-2 text-gray-300 hover:text-white" aria-label="Tutup perpustakaan"><i data-lucide="x" class="w-5 h-5"></i></button>
+        </header>
+        <div class="library-content space-y-4">
+          <div class="rounded-xl border border-emerald-500/25 bg-emerald-950/20 p-4">
+            <div class="flex flex-wrap items-center justify-between gap-2">
+              <div><h3 class="text-sm font-extrabold text-emerald-300">Tambah / Ganti Buku</h3><p class="library-muted mt-1">Pilih file PDF dari perangkat. Buku akan tersimpan di browser ini.</p></div>
+              <span id="libraryStorageStatus" class="text-[10px] text-gray-400">Penyimpanan lokal</span>
+            </div>
+            <form id="libraryUploadForm" class="mt-3 grid grid-cols-1 sm:grid-cols-[1fr_1fr_auto] gap-2">
+              <input id="libraryBookTitle" required maxlength="90" placeholder="Nama buku, contoh: Bahasa Inggris" class="min-w-0 rounded-lg border border-gray-700 bg-[#080c14] px-3 py-2.5 text-xs text-white outline-none focus:border-emerald-500">
+              <input id="libraryPdfFile" required type="file" accept="application/pdf,.pdf" class="min-w-0 rounded-lg border border-gray-700 bg-[#080c14] px-2 py-2 text-xs text-gray-300">
+              <button type="submit" class="rounded-lg bg-emerald-600 px-4 py-2.5 text-xs font-extrabold text-white hover:bg-emerald-500">Simpan Buku</button>
+            </form>
+            <p class="library-muted mt-2">Untuk mengganti buku, gunakan nama buku yang sama lalu pilih PDF baru. File lama akan digantikan.</p>
+          </div>
+          <div class="flex items-center justify-between gap-2"><div><h3 class="font-extrabold text-white">Rak Buku</h3><p class="library-muted">Tekan buku untuk membukanya.</p></div><span id="libraryBookCount" class="text-xs text-gray-400">0 buku</span></div>
+          <div id="libraryBookGrid" class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3"></div>
+          <div id="libraryEmpty" class="rounded-xl border border-dashed border-gray-700 p-8 text-center">
+            <div class="text-3xl mb-2">📚</div><p class="text-sm font-bold text-gray-200">Rak buku masih kosong</p><p class="library-muted mt-1">Tambahkan buku paket PDF untuk mulai membaca.</p>
+          </div>
+        </div>
+      </section>
+    </div>
+    <div id="libraryReader" class="library-reader" aria-hidden="true">
+      <section class="reader-panel" role="dialog" aria-modal="true" aria-label="Pembaca buku PDF">
+        <header class="reader-toolbar">
+          <button type="button" id="readerBack">← Rak Buku</button>
+          <div class="min-w-0 flex-1"><div id="readerBookTitle" class="truncate text-sm font-extrabold text-white">Buku</div><div id="readerPageInfo" class="text-[10px] text-gray-400">Halaman 1</div></div>
+          <button type="button" id="readerPrev">‹ Sebelumnya</button>
+          <label class="flex items-center gap-1 text-xs text-gray-300">Hal.
+            <input id="readerPageNumber" class="reader-page-input" type="number" min="1" value="1" aria-label="Nomor halaman">
+          </label>
+          <button type="button" id="readerNext">Berikutnya ›</button>
+        </header>
+        <div id="readerLoading" class="hidden px-4 py-2 text-center text-xs text-emerald-300">Memuat halaman buku...</div>
+        <div class="reader-page-area"><canvas id="libraryPdfCanvas"></canvas></div>
+        <footer class="flex flex-wrap items-center justify-between gap-2 border-t border-gray-800 bg-[#101722] px-4 py-3">
+          <p class="library-muted">Gunakan tombol sebelumnya/berikutnya atau ketik nomor halaman (misalnya 1–370).</p>
+          <button type="button" id="readerClose" class="rounded-lg bg-gray-800 px-3 py-2 text-xs font-bold text-gray-200">Tutup Pembaca</button>
+        </footer>
+      </section>
+    </div>
+
+    <!-- Music Player -->
+    <div id="musicOverlay" aria-hidden="true">
+        <div class="mp-sheet" role="dialog" aria-label="Music Player">
+            <div class="mp-head">
+                <div class="mp-logo"><svg viewBox="0 0 24 24" class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg></div>
+                <div><div class="mp-title">Music Player</div><div class="mp-sub">MP3 • Local • YouTube • TikTok</div></div>
+                <button type="button" id="mpAdminBtn" class="mp-close" style="margin-left:auto;width:auto;padding:0 12px;border-radius:12px;font-size:11px" aria-label="Login admin">Admin</button><button type="button" id="mpClose" class="mp-close" aria-label="Tutup"><svg viewBox="0 0 24 24" class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M18 6 6 18M6 6l12 12"/></svg></button>
+            </div>
+            <div class="mp-listhead"><span># Playlist</span><span id="mpCount">0 lagu</span></div>
+            <div class="mp-list" id="mpList"></div>
+            
+            <section id="mpAdminPanel" class="mp-add" style="display:none">
+                <div class="mp-addtitle">🔐 Admin Musik — khusus pengelola halaman ini</div>
+                <form id="mpAddForm" style="display:grid;gap:7px">
+                  <input id="mpInputTitle" type="text" maxlength="90" placeholder="Judul lagu" required>
+                  <input id="mpInputArtist" type="text" maxlength="60" placeholder="Nama penyanyi / artis">
+                  <select id="mpInputType" style="width:100%;padding:9px 11px;border-radius:9px;border:1px solid #334155;background:#101914;color:#f3f4f6;font-size:12px"><option value="mp3">Audio MP3 langsung (URL)</option><option value="local">File Audio Perangkat (Lokal)</option><option value="youtube">YouTube (pemutar resmi)</option><option value="tiktok">TikTok (pemutar resmi)</option></select>
+                  <input id="mpInputUrl" type="url" placeholder="Tempel URL MP3 / YouTube / TikTok" required>
+                  <button type="submit" id="mpSubmitBtn">Tambah ke playlist</button>
+                  <button type="button" id="mpCancelEdit" style="display:none;background:#374151">Batal edit</button>
+                </form>
+                
+                <label for="mpFileInput" class="mp-file-btn">
+                    🎵 Pilih beberapa file MP3 dari perangkat
+                </label>
+                <input type="file" id="mpFileInput" accept="audio/*,.mp3,.wav,.ogg,.m4a" multiple style="display:none">
+
+                <div class="mp-addhint">Pilih jenis sumber sesuai link atau langsung impor file audio tanpa batas (bisa 100+ lagu sekaligus) dari HP/Laptop Anda.</div>
+                <button type="button" id="mpLogoutBtn" style="padding:8px;border-radius:9px;background:#374151;color:#fff;font-size:11px;font-weight:700">Keluar dari Admin</button>
+            </section>
+
+            <div id="mpEmbedWrap" style="display:none;padding:10px 18px;background:#050807"><iframe id="mpEmbed" title="Pemutar media" style="width:100%;aspect-ratio:16/9;border:0;border-radius:12px" allow="autoplay; encrypted-media; picture-in-picture; fullscreen" allowfullscreen></iframe></div>
+            <div class="mp-now">
+                <div class="mp-nowrow">
+                    <div class="mp-cover" id="mpCover"><i></i><i></i><i></i><i></i><i></i></div>
+                    <div style="min-width:0"><div class="mp-nname" id="mpName">-</div><div class="mp-nartist" id="mpArtist">-</div></div>
+                </div>
+                <div class="mp-bar" id="mpBar"><div class="mp-fill" id="mpFill"></div></div>
+                <div class="mp-times"><span id="mpCur">00:00</span><span id="mpDur">00:00</span></div>
+                <div class="mp-ctrl">
+                    <button type="button" id="mpPrev" aria-label="Sebelumnya"><svg viewBox="0 0 24 24" class="w-6 h-6" fill="currentColor"><path d="M6 5h2v14H6zM20 5v14L9 12z"/></svg></button>
+                    <button type="button" id="mpPlay" class="mp-play" aria-label="Putar"><svg id="mpIcon" viewBox="0 0 24 24" class="w-7 h-7" fill="currentColor"><path d="M8 5v14l11-7z"/></svg></button>
+                    <button type="button" id="mpNext" aria-label="Berikutnya"><svg viewBox="0 0 24 24" class="w-6 h-6" fill="currentColor"><path d="M16 5h2v14h-2zM4 5v14l11-7z"/></svg></button>
+                </div>
+                <div class="mp-msg" id="mpMsg"></div>
+            </div>
+        </div>
+    </div>
+    
+    <audio id="mpAudio" preload="none"></audio>
+
+    <!-- Godspeed Sticker Pack -->
+    <div id="stickerModal" aria-hidden="true">
+      <section class="sticker-panel" role="dialog" aria-modal="true" aria-label="Godspeed Sticker Pack">
+        <div class="sticky top-0 z-10 flex items-center gap-3 border-b border-gray-800 bg-[#0e1521]/95 p-4 backdrop-blur">
+          <div class="grid h-11 w-11 place-items-center rounded-xl border border-purple-500/30 bg-purple-500/10 text-purple-300"><i data-lucide="sticker" class="h-6 w-6"></i></div>
+          <div class="min-w-0"><h2 class="font-black text-white">Godspeed Sticker Pack</h2><p class="text-xs text-gray-400">Cari, pilih, dan bagikan koleksi stiker</p></div>
+          <button id="stickerClose" class="ml-auto rounded-xl bg-gray-800 px-3 py-2 text-sm text-gray-300 hover:text-white" type="button">✕</button>
+        </div>
+        <div class="space-y-4 p-4 sm:p-5">
+          <div class="flex flex-col gap-3 sm:flex-row">
+            <input id="stickerSearch" type="search" placeholder="Cari nama stiker..." class="min-w-0 flex-1 rounded-xl border border-gray-700 bg-gray-950 px-4 py-3 text-sm text-white outline-none focus:border-purple-500">
+            <button id="stickerAdminLogin" type="button" class="rounded-xl border border-purple-500/40 bg-purple-950/40 px-4 py-3 text-xs font-bold text-purple-200">🔐 Admin / Tambah Stiker</button>
+          </div>
+          <section id="stickerAdminPanel" class="space-y-3 rounded-2xl border border-purple-500/30 bg-purple-950/20 p-4">
+            <div><h3 class="text-sm font-extrabold text-white">Kelola Sticker Pack</h3><p class="mt-1 text-xs text-gray-400">Pilih banyak gambar sekaligus. Gambar akan disimpan di database browser ini.</p></div>
+            <input id="stickerNamePrefix" type="text" maxlength="50" placeholder="Nama paket / kategori (opsional)" class="w-full rounded-lg border border-gray-700 bg-gray-950 px-3 py-2.5 text-xs text-white">
+            <label for="stickerFiles" class="flex cursor-pointer items-center justify-center gap-2 rounded-xl border border-dashed border-purple-400/50 bg-purple-500/10 px-4 py-4 text-sm font-bold text-purple-200 hover:bg-purple-500/20">＋ Pilih banyak gambar stiker</label>
+            <input id="stickerFiles" type="file" accept="image/*" multiple hidden>
+            <div id="stickerAdminStatus" class="text-xs text-gray-400" aria-live="polite">Belum ada file dipilih.</div>
+            <button id="stickerLogout" type="button" class="rounded-lg bg-gray-800 px-3 py-2 text-xs font-bold text-gray-300">Keluar dari Admin</button>
+          </section>
+          <div class="flex items-center justify-between gap-2"><h3 class="text-sm font-extrabold text-white">Semua Stiker</h3><span id="stickerCount" class="text-xs text-gray-500">0 stiker</span></div>
+          <div id="stickerGrid" class="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4"></div>
+          <p id="stickerNotice" class="rounded-xl border border-yellow-500/20 bg-yellow-500/5 p-3 text-[11px] leading-relaxed text-gray-400">Catatan: tombol Bagikan mengirim gambar WebP melalui menu berbagi perangkat. WhatsApp mungkin mengirimnya sebagai gambar biasa, bukan memasangnya otomatis sebagai paket stiker. Pemasangan paket stiker langsung memerlukan aplikasi/format paket WhatsApp khusus.</p>
+        </div>
+      </section>
+    </div>
+
+
+    <!-- Modal Pop-up Konfigurasi Bot & Verifikasi Nomor -->
+    <div id="botConfigModal" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-md p-4 overflow-y-auto">
+        <div class="bg-[#121824] border border-gray-700 rounded-2xl max-w-lg w-full p-6 shadow-2xl relative max-h-[90vh] overflow-y-auto my-auto text-left">
+            <button id="closeBotConfigBtn" type="button" class="absolute top-4 right-4 text-gray-400 hover:text-white p-1 rounded-lg bg-gray-800/50 hover:bg-gray-800 transition">
+                <i data-lucide="x" class="w-5 h-5"></i>
+            </button>
+            
+            <div class="flex items-center gap-3 mb-4">
+                <div class="w-10 h-10 rounded-xl bg-blue-600/20 border border-blue-500/40 flex items-center justify-center text-blue-400">
+                    <i data-lucide="bot" class="w-5 h-5"></i>
+                </div>
+                <div>
+                    <h3 class="text-lg font-black text-white">Konfigurasi Bot</h3>
+                    <p class="text-xs text-gray-400">Atur identitas dan metode tautan perangkat</p>
+                </div>
+            </div>
+
+            <form id="botConfigForm" class="space-y-4">
+                <!-- Section Konfigurasi Bot -->
+                <div class="bg-gray-900/60 border border-gray-800 rounded-xl p-4 space-y-3">
+                    <div>
+                        <label class="block text-xs font-bold text-gray-200 mb-1">Nama Bot Anda</label>
+                        <input type="text" id="botNameInput" placeholder="Contoh: Dikaaapp Bot" class="w-full bg-gray-950 border border-gray-700 rounded-lg px-3 py-2 text-xs text-white placeholder-gray-500 focus:outline-none focus:border-blue-500" required>
+                        <p class="text-[10px] text-gray-400 mt-1">Masukkan nama yang akan ditampilkan pada bot Anda.</p>
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-bold text-gray-200 mb-1">Pilih Server Bot</label>
+                        <select id="botServerSelect" class="w-full bg-gray-950 border border-gray-700 rounded-lg px-3 py-2 text-xs text-white focus:outline-none focus:border-blue-500">
+                            <option value="auto">Pilih Otomatis (Rekomendasi)</option>
+                            <option value="sg">Server Singapura (Kecepatan Tinggi)</option>
+                            <option value="id">Server Indonesia (Lokal)</option>
+                        </select>
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-bold text-gray-200 mb-1">Metode Tautkan Perangkat</label>
+                        <select id="botPairMethod" class="w-full bg-gray-950 border border-gray-700 rounded-lg px-3 py-2 text-xs text-white focus:outline-none focus:border-blue-500">
+                            <option value="pairing">Pairing Code (Default)</option>
+                            <option value="qr">Scan QR Code</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Section Verifikasi Nomor -->
+                <div class="bg-gray-900/60 border border-gray-800 rounded-xl p-4 space-y-3">
+                    <div class="flex items-center gap-2 mb-1">
+                        <i data-lucide="smartphone" class="w-4 h-4 text-blue-400"></i>
+                        <h4 class="text-xs font-bold text-white">Verifikasi Nomor</h4>
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-bold text-gray-200 mb-1">Nama Pengirim</label>
+                        <input type="text" id="senderNameInput" placeholder="Masukkan nama Anda" class="w-full bg-gray-950 border border-gray-700 rounded-lg px-3 py-2 text-xs text-white placeholder-gray-500 focus:outline-none focus:border-blue-500" required>
+                        <p class="text-[10px] text-gray-400 mt-1">Nama ini akan dicantumkan di pesan WhatsApp agar admin mengetahui siapa yang mengajukan permintaan.</p>
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-bold text-gray-200 mb-1">Nomor WhatsApp</label>
+                        <div class="space-y-2">
+                            <div>
+                                <label class="block text-[10px] text-gray-400 mb-0.5">Negara / Kode Telepon</label>
+                                <select id="countryCodeSelect" class="w-full bg-gray-950 border border-gray-700 rounded-lg px-3 py-2 text-xs text-white focus:outline-none focus:border-blue-500">
+                                    <option value="62">🇮🇩 Indonesia (+62)</option>
+                                    <option value="60">🇲🇾 Malaysia (+60)</option>
+                                    <option value="65">🇸🇬 Singapura (+65)</option>
+                                </select>
+                            </div>
+                            <input type="tel" id="whatsappNumInput" placeholder="Masukkan nomor tanpa kode negara (Contoh: 81234567890)" class="w-full bg-gray-950 border border-gray-700 rounded-lg px-3 py-2 text-xs text-white placeholder-gray-500 focus:outline-none focus:border-blue-500" required>
+                        </div>
+                        <p class="text-[10px] text-gray-400 mt-1">Pilih negara lalu masukkan nomor telepon tanpa kode negara. Form ini hanya mengirim permintaan ke admin dan belum terhubung ke layanan verifikasi atau penautan WhatsApp sungguhan.</p>
+                    </div>
+
+                    <button type="submit" class="w-full bg-blue-600 hover:bg-blue-500 text-white font-bold text-xs py-2.5 rounded-lg shadow-md transition-all">
+                        Verifikasi Nomor
+                    </button>
+                </div>
+
+                <!-- Informasi Penting -->
+                <div class="bg-yellow-500/10 border border-yellow-500/30 rounded-xl p-3 text-[11px] space-y-2 text-yellow-200/90">
+                    <div class="font-bold flex items-center gap-1.5 text-yellow-400">
+                        <i data-lucide="alert-triangle" class="w-4 h-4"></i> INFORMASI PENTING
+                    </div>
+                    <p class="text-gray-300">Setelah Anda menekan tombol <strong>Verifikasi Nomor</strong>, WhatsApp Admin Dikaaapp / Store akan terbuka dengan pesan berisi nama dan nomor yang Anda masukkan. Tekan <strong>Kirim</strong> di WhatsApp agar permintaan diterima admin.</p>
+                    <ul class="space-y-1.5 pl-1">
+                        <li class="flex items-start gap-1.5"><span class="text-emerald-400">✅</span> <span>Admin akan memeriksa dan mengonfirmasi permintaan Anda terlebih dahulu.</span></li>
+                        <li class="flex items-start gap-1.5"><span class="text-purple-400">👾</span> <span>Setelah dikonfirmasi, admin akan membantu proses pemasangan atau penautan bot ke nomor WhatsApp Anda sesuai layanan yang tersedia. Waktu proses bergantung pada antrean dan ketersediaan layanan.</span></li>
+                        <li class="flex items-start gap-1.5"><span class="text-yellow-400">🔓</span> <span>Jangan berikan OTP, PIN, atau kode penautan kepada siapa pun. Penautan harus dilakukan melalui proses resmi dan dengan persetujuan pemilik nomor.</span></li>
+                    </ul>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Script Music Player -->
+    <script>
+(function(){
+  var STORAGE_KEY='dikaaapp_mp3_playlist_v3';
+  var ADMIN_PASSWORD='090617';
+  var isAdmin=false, editingIndex=-1;
+  var PLAYLIST=[];
+  
+  var db;
+  var request = indexedDB.open('MusicPlayerAudioDB', 1);
+  request.onupgradeneeded = function(e) {
+    db = e.target.result;
+    if(!db.objectStoreNames.contains('audios')) {
+      db.createObjectStore('audios', { keyPath: 'id' });
+    }
+  };
+  request.onsuccess = function(e) {
+    db = e.target.result;
+    initPlaylist();
+  };
+  request.onerror = function(e) {
+    console.error('IndexedDB error:', e);
+    initPlaylist();
+  };
+
+  function storeAudioBlob(id, file, callback) {
+    if(!db) return callback(null);
+    var tx = db.transaction(['audios'], 'readwrite');
+    var store = tx.objectStore('audios');
+    store.put({ id: id, blob: file });
+    tx.oncomplete = function() { callback(true); };
+    tx.onerror = function() { callback(false); };
+  }
+
+  function getAudioBlob(id, callback) {
+    if(!db) return callback(null);
+    var tx = db.transaction(['audios'], 'readonly');
+    var store = tx.objectStore('audios');
+    var req = store.get(id);
+    req.onsuccess = function() {
+      callback(req.result ? req.result.blob : null);
+    };
+    req.onerror = function() { callback(null); };
+  }
+
+  function removeAudioBlob(id) {
+    if(!db) return;
+    var tx = db.transaction(['audios'], 'readwrite');
+    tx.objectStore('audios').delete(id);
+  }
+
+  function initPlaylist() {
+    try {
+      var saved=JSON.parse(localStorage.getItem(STORAGE_KEY)||'[]');
+      if(Array.isArray(saved)) PLAYLIST=saved.filter(function(t){return t&&typeof t.title==='string'});
+    } catch(e) { PLAYLIST=[]; }
+    load(0);
+  }
+
+  var $=function(id){return document.getElementById(id)};
+  var audio=$('mpAudio'), overlay=$('musicOverlay'), cur=0, msgT;
+  var PLAY='<path d="M8 5v14l11-7z"/>', PAUSE='<path d="M7 5h4v14H7zM13 5h4v14h-4z"/>';
+  function pad(n){return (n<10?'0':'')+n}
+  function fmt(t){if(!isFinite(t))t=0;return pad(Math.floor(t/60))+':'+pad(Math.floor(t%60))}
+  function msg(t){$('mpMsg').textContent=t;clearTimeout(msgT);if(t)msgT=setTimeout(function(){$('mpMsg').textContent=''},4500)}
+  
+  function savePlaylist(){
+    try{
+      var toSave = PLAYLIST.map(function(item){
+        return { id: item.id, title: item.title, artist: item.artist, type: item.type, src: item.type==='local' ? '' : item.src };
+      });
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(toSave));
+    } catch(e){
+      console.warn('Penyimpanan playlist diperbarui.');
+    }
+  }
+
+  function esc(s){return String(s).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]})}
+  
+  function renderList(){
+    $('mpCount').textContent=PLAYLIST.length+' lagu';
+    $('mpAdminPanel').style.display=isAdmin?'grid':'none';
+    if(!PLAYLIST.length){$('mpList').innerHTML='<div class="mp-empty">Playlist masih kosong.<br>Tambahkan lagu menggunakan link MP3 atau pilih file dari perangkat Anda.</div>';return;}
+    $('mpList').innerHTML=PLAYLIST.map(function(t,i){
+      var subType = (t.type||'mp3').toUpperCase();
+      if(t.type === 'local') subType = 'LOCAL';
+      return '<div style="display:flex;align-items:center;gap:6px"><button type="button" class="mp-item'+(i===cur?' active':'')+'" data-i="'+i+'" style="flex:1"><span class="mp-num">'+pad(i+1)+'</span><span style="min-width:0"><div class="mp-name">'+esc(t.title)+'</div><div class="mp-artist">'+esc(t.artist||'File dari perangkat')+' · '+subType+'</div></span></button>'+(isAdmin?'<button type="button" data-edit="'+i+'" style="padding:8px;color:#fbbf24">Edit</button><button type="button" data-del="'+i+'" style="padding:8px;color:#f87171">Hapus</button>':'')+'</div>';
+    }).join('');
+  }
+  
+  function setUI(){
+    var t=PLAYLIST[cur];
+    $('mpName').textContent=t?t.title:'Belum ada lagu';
+    $('mpArtist').textContent=t?(t.artist ? 'By '+t.artist : 'File dari perangkat'):'Pilih file MP3 untuk mulai';
+    var playing=!audio.paused&&!audio.ended;
+    $('mpIcon').innerHTML=playing?PAUSE:PLAY;
+    $('mpCover').classList.toggle('playing',playing);
+    $('musicBtn').classList.toggle('playing',playing);
+    $('mpPlay').disabled=!PLAYLIST.length;
+    $('mpPrev').disabled=!PLAYLIST.length;
+    $('mpNext').disabled=!PLAYLIST.length;
+    $('mpPlay').style.opacity=$('mpPrev').style.opacity=$('mpNext').style.opacity=PLAYLIST.length?'1':'.4';
+    renderList();
+  }
+
+  function load(i){
+    if(!PLAYLIST.length){cur=0;audio.pause();audio.removeAttribute('src');audio.load();$('mpFill').style.width='0%';$('mpCur').textContent='00:00';$('mpDur').textContent='00:00';setUI();return;}
+    cur=(i+PLAYLIST.length)%PLAYLIST.length;
+    var t=PLAYLIST[cur];
+    $('mpEmbedWrap').style.display='none';$('mpEmbed').src='';
+
+    if(t.type==='local') {
+      if(t.src && t.src.startsWith('blob:')) {
+        audio.src = t.src;
+        audio.load();
+      } else if(t.id) {
+        msg('Memuat audio terpublikasi dari penyimpanan lokal...');
+        getAudioBlob(t.id, function(blob) {
+          if(blob) {
+            t.src = URL.createObjectURL(blob);
+            audio.src = t.src;
+            audio.load();
+            msg('✅ Audio tersimpan berhasil dimuat!');
+          } else {
+            audio.pause(); audio.removeAttribute('src'); audio.load();
+            msg('⚠️ File audio belum ada di penyimpanan database browser ini.');
+          }
+        });
+      }
+    } else if(t.type==='mp3'||!t.type) {
+      if(t.src) { audio.src=t.src; audio.load(); }
+    } else {
+      audio.pause();audio.removeAttribute('src');audio.load();
+    }
+    $('mpFill').style.width='0%';$('mpCur').textContent='00:00';$('mpDur').textContent='00:00';
+    setUI();
+  }
+
+  function play(){
+    if(!PLAYLIST.length){msg('Playlist masih kosong.');return;}
+    var t=PLAYLIST[cur];
+    if(t.type==='youtube'||t.type==='tiktok'){
+      var id='',embed='';
+      try{
+        var u=new URL(t.src);
+        if(t.type==='youtube'){
+          id=u.hostname.indexOf('youtu.be')>=0?u.pathname.slice(1):u.searchParams.get('v')||u.pathname.split('/').filter(Boolean).pop();
+          if(!/^[A-Za-z0-9_-]{6,}$/.test(id||''))throw 0;
+          embed='https://www.youtube-nocookie.com/embed/'+id+'?autoplay=1&rel=0';
+        }else{
+          id=u.pathname.match(/\/(?:video\/)?(\d{8,})/)?.[1]||u.searchParams.get('item_id');
+          if(!/^\d{8,}$/.test(id||''))throw 0;
+          embed='https://www.tiktok.com/player/v1/'+id+'?autoplay=1';
+        }
+      }catch(e){msg('Link tidak valid.');return;}
+      $('mpEmbed').src=embed;$('mpEmbedWrap').style.display='block';msg('Membuka pemutar resmi '+t.type.toUpperCase());return;
+    }
+
+    if(!t.src){
+      msg('⚠️ Sedang menyiapkan audio... Tekan play sekali lagi.');
+      load(cur);
+      return;
+    }
+
+    var p=audio.play();
+    if(p&&p.catch)p.catch(function(err){
+      msg('⚠️ Gagal memutar audio.');
+      setUI();
+    });
+  }
+
+  function toggle(){if(!PLAYLIST.length){msg('Tambahkan lagu terlebih dahulu.');return;}if(audio.paused)play();else audio.pause();}
+  function open(){overlay.classList.add('open');overlay.setAttribute('aria-hidden','false');document.body.style.overflow='hidden'}
+  function close(){overlay.classList.remove('open');overlay.setAttribute('aria-hidden','true');document.body.style.overflow=''}
+
+  $('musicBtn').addEventListener('click',open);
+  $('mpClose').addEventListener('click',close);
+  overlay.addEventListener('click',function(e){if(e.target===overlay)close()});
+  document.addEventListener('keydown',function(e){if(e.key==='Escape')close()});
+  $('mpPlay').addEventListener('click',toggle);
+  $('mpNext').addEventListener('click',function(){if(!PLAYLIST.length)return;var w=!audio.paused;load(cur+1);if(w)play()});
+  $('mpPrev').addEventListener('click',function(){if(!PLAYLIST.length)return;var w=!audio.paused;if(audio.currentTime>3){audio.currentTime=0;return;}load(cur-1);if(w)play()});
+  
+  $('mpList').addEventListener('click',function(e){
+    var d=e.target.closest('[data-del]');
+    if(d&&isAdmin){
+      var di=+d.dataset.del;
+      if(confirm('Hapus lagu ini?')){
+        if(PLAYLIST[di].id) removeAudioBlob(PLAYLIST[di].id);
+        PLAYLIST.splice(di,1);savePlaylist();
+        if(cur>=PLAYLIST.length)cur=Math.max(0,PLAYLIST.length-1);
+        load(cur);
+      }
+      return;
+    }
+    var ed=e.target.closest('[data-edit]');
+    if(ed&&isAdmin){
+      var ei=+ed.dataset.edit,t=PLAYLIST[ei];
+      editingIndex=ei;
+      $('mpInputTitle').value=t.title;
+      $('mpInputArtist').value=t.artist||'';
+      $('mpInputType').value=t.type==='local'?'local':(t.type||'mp3');
+      $('mpInputUrl').value=t.src||'';
+      $('mpSubmitBtn').textContent='Simpan perubahan';
+      $('mpCancelEdit').style.display='block';
+      return;
+    }
+    var b=e.target.closest('.mp-item');
+    if(!b)return;
+    load(+b.dataset.i);play();
+  });
+
+  $('mpAdminBtn').addEventListener('click',function(){
+    if(isAdmin){$('mpAdminPanel').scrollIntoView({behavior:'smooth',block:'nearest'});return;}
+    var pass=prompt('Masukkan password Admin Musik:');
+    if(pass===ADMIN_PASSWORD){isAdmin=true;setUI();msg('Login admin berhasil.');}
+    else if(pass!==null)msg('Password admin salah.');
+  });
+  
+  $('mpLogoutBtn').addEventListener('click',function(){isAdmin=false;editingIndex=-1;$('mpAddForm').reset();$('mpSubmitBtn').textContent='Tambah ke playlist';$('mpCancelEdit').style.display='none';setUI();});
+  $('mpCancelEdit').addEventListener('click',function(){editingIndex=-1;$('mpAddForm').reset();$('mpSubmitBtn').textContent='Tambah ke playlist';$('mpCancelEdit').style.display='none';});
+
+  $('mpInputType').addEventListener('change', function(){
+    if(this.value === 'local'){
+      $('mpInputUrl').required = false;
+      $('mpInputUrl').placeholder = "URL opsional / tidak wajib untuk file lokal";
+    } else {
+      $('mpInputUrl').required = true;
+      $('mpInputUrl').placeholder = "Tempel URL MP3 / YouTube / TikTok";
+    }
+  });
+
+  $('mpAddForm').addEventListener('submit',function(e){
+    e.preventDefault();if(!isAdmin){msg('Login admin diperlukan.');return;}
+    var title=$('mpInputTitle').value.trim(),artist=$('mpInputArtist').value.trim()||'Unknown artist',raw=$('mpInputUrl').value.trim(),type=$('mpInputType').value;
+    if(!title){msg('Isi judul lagu terlebih dahulu.');return;}
+    
+    var urlHref = '';
+    if(type !== 'local'){
+      if(!raw){msg('Isi URL terlebih dahulu.');return;}
+      try{urlHref=new URL(raw).href}catch(err){msg('Format URL tidak valid.');return;}
+    } else {
+      urlHref = raw ? raw : '';
+    }
+    
+    var item={id: 'local_' + Date.now(), title:title,artist:artist,src:urlHref,type:type};
+    if(editingIndex>=0){PLAYLIST[editingIndex]=item;cur=editingIndex;editingIndex=-1;msg('Lagu diperbarui.');}else{PLAYLIST.push(item);cur=PLAYLIST.length-1;msg('Lagu ditambahkan.');}
+    savePlaylist();$('mpAddForm').reset();$('mpSubmitBtn').textContent='Tambah ke playlist';$('mpCancelEdit').style.display='none';
+    $('mpInputUrl').required = true;
+    $('mpInputUrl').placeholder = "Tempel URL MP3 / YouTube / TikTok";
+    load(cur);
+  });
+
+  $('mpFileInput').addEventListener('change', function(e){
+    var files = e.target.files;
+    if(!files || !files.length) return;
+    var addedCount = 0;
+    
+    Array.from(files).forEach(function(file){
+      var uniqueId = 'audio_' + Date.now() + '_' + Math.random().toString(36).substr(2, 5);
+      var objectUrl = URL.createObjectURL(file);
+      var nameWithoutExt = file.name.replace(/\.[^/.]+$/, "");
+      
+      var newItem = {
+        id: uniqueId,
+        title: nameWithoutExt,
+        artist: 'File dari perangkat',
+        src: objectUrl,
+        type: 'local'
+      };
+      
+      PLAYLIST.push(newItem);
+      addedCount++;
+      
+      storeAudioBlob(uniqueId, file, function(success){
+        if(success) console.log('File audio berhasil disimpan secara permanen di browser.');
+      });
+    });
+
+    savePlaylist();
+    cur = PLAYLIST.length - addedCount;
+    load(cur);
+    play();
+    msg(addedCount + ' file audio berhasil disimpan secara permanen!');
+    $('mpFileInput').value = '';
+  });
+
+  $('mpBar').addEventListener('click',function(e){if(!audio.duration)return;var r=this.getBoundingClientRect();audio.currentTime=audio.duration*Math.min(1,Math.max(0,(e.clientX-r.left)/r.width))});
+  audio.addEventListener('timeupdate',function(){$('mpCur').textContent=fmt(audio.currentTime);$('mpFill').style.width=(audio.duration?audio.currentTime/audio.duration*100:0)+'%'});
+  audio.addEventListener('loadedmetadata',function(){$('mpDur').textContent=fmt(audio.duration)});
+  audio.addEventListener('play',setUI);audio.addEventListener('pause',setUI);
+  audio.addEventListener('ended',function(){if(PLAYLIST.length>1){load(cur+1);play()}else{audio.currentTime=0;setUI()}});
+  audio.addEventListener('error',function(){if(audio.getAttribute('src'))msg('Audio tidak dapat diputar.');setUI()});
+})();
+    </script>
+
+
+
+    <!-- Script Godspeed Sticker Pack -->
+    <script>
+    (function(){
+      const DB_NAME='GodspeedStickerDB', STORE='stickers';
+      const ADMIN_PASSWORD='090617';
+      let db=null, isAdmin=false, allStickers=[];
+      const $=id=>document.getElementById(id);
+      const modal=$('stickerModal');
+      const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+      const open=()=>{modal.classList.add('open');modal.setAttribute('aria-hidden','false');document.body.style.overflow='hidden';render();};
+      const close=()=>{modal.classList.remove('open');modal.setAttribute('aria-hidden','true');document.body.style.overflow='';};
+      $('openStickerBtn').addEventListener('click',open);
+      $('openStickerMenu').addEventListener('click',()=>{ $('menuDropdown').classList.add('hidden'); open(); });
+      $('stickerClose').addEventListener('click',close);
+      modal.addEventListener('click',e=>{if(e.target===modal)close();});
+      document.addEventListener('keydown',e=>{if(e.key==='Escape'&&modal.classList.contains('open'))close();});
+
+      function openDB(){
+        return new Promise((resolve,reject)=>{
+          const req=indexedDB.open(DB_NAME,1);
+          req.onupgradeneeded=()=>{const d=req.result;if(!d.objectStoreNames.contains(STORE))d.createObjectStore(STORE,{keyPath:'id'});};
+          req.onsuccess=()=>{db=req.result;resolve(db);};
+          req.onerror=()=>reject(req.error);
+        });
+      }
+      function getAll(){
+        return new Promise((resolve,reject)=>{
+          if(!db)return resolve([]);
+          const req=db.transaction(STORE,'readonly').objectStore(STORE).getAll();
+          req.onsuccess=()=>resolve(req.result||[]);req.onerror=()=>reject(req.error);
+        });
+      }
+      function put(item){
+        return new Promise((resolve,reject)=>{
+          const tx=db.transaction(STORE,'readwrite');tx.objectStore(STORE).put(item);
+          tx.oncomplete=resolve;tx.onerror=()=>reject(tx.error);
+        });
+      }
+      function remove(id){
+        return new Promise((resolve,reject)=>{
+          const tx=db.transaction(STORE,'readwrite');tx.objectStore(STORE).delete(id);
+          tx.oncomplete=resolve;tx.onerror=()=>reject(tx.error);
+        });
+      }
+      async function render(){
+        try{allStickers=await getAll();}catch(e){$('stickerGrid').innerHTML='<p class="col-span-full text-sm text-red-300">Database stiker tidak dapat dibuka di browser ini.</p>';return;}
+        const q=$('stickerSearch').value.trim().toLowerCase();
+        const list=allStickers.filter(x=>(x.name+' '+(x.category||'')).toLowerCase().includes(q));
+        $('stickerCount').textContent=allStickers.length+' stiker';
+        if(!list.length){$('stickerGrid').innerHTML='<div class="col-span-full rounded-xl border border-gray-800 bg-gray-900/50 p-8 text-center text-sm text-gray-500">Belum ada stiker yang cocok. Admin dapat menambahkan gambar melalui menu Admin.</div>';return;}
+        $('stickerGrid').innerHTML=list.map(x=>`<article class="sticker-card">
+          <div class="sticker-preview"><img src="${URL.createObjectURL(x.blob)}" alt="${esc(x.name)}"></div>
+          <div class="min-w-0"><p class="truncate text-xs font-bold text-white">${esc(x.name)}</p><p class="truncate text-[10px] text-gray-500">${esc(x.category||'Godspeed Sticker Pack')}</p></div>
+          <button class="sticker-action primary" data-share="${esc(x.id)}" type="button">↗ Bagikan</button>
+          <button class="sticker-action" data-download="${esc(x.id)}" type="button">↓ Download</button>
+          ${isAdmin?`<button class="sticker-action danger" data-delete="${esc(x.id)}" type="button">Hapus stiker</button>`:''}
+        </article>`).join('');
+      }
+      $('stickerSearch').addEventListener('input',render);
+      $('stickerAdminLogin').addEventListener('click',()=>{
+        if(isAdmin){$('stickerAdminPanel').style.display='block';return;}
+        const pass=prompt('Masukkan password Admin Sticker:');
+        if(pass===ADMIN_PASSWORD){isAdmin=true;$('stickerAdminPanel').style.display='block';$('stickerAdminLogin').textContent='✓ Admin Aktif';render();}
+        else if(pass!==null)alert('Password admin salah.');
+      });
+      $('stickerLogout').addEventListener('click',()=>{isAdmin=false;$('stickerAdminPanel').style.display='none';$('stickerAdminLogin').textContent='🔐 Admin / Tambah Stiker';render();});
+      $('stickerFiles').addEventListener('change',async e=>{
+        if(!isAdmin){alert('Login admin terlebih dahulu.');return;}
+        const files=Array.from(e.target.files||[]);if(!files.length)return;
+        const category=$('stickerNamePrefix').value.trim()||'Godspeed Sticker Pack';
+        let count=0,failed=0;
+        $('stickerAdminStatus').textContent='Menyimpan '+files.length+' gambar...';
+        for(const file of files){
+          if(!file.type.startsWith('image/')){failed++;continue;}
+          try{
+            const blob=await makeSticker(file);
+            const base=file.name.replace(/\.[^.]+$/,'');
+            await put({id:'st_'+Date.now().toString(36)+'_'+Math.random().toString(36).slice(2,9),name:base,category,blob,createdAt:Date.now()});
+            count++;
+          }catch(err){failed++;}
+        }
+        $('stickerAdminStatus').textContent=count+' stiker berhasil ditambahkan'+(failed?' · '+failed+' file gagal':'')+'.';
+        e.target.value='';await render();
+      });
+      function makeSticker(file){
+        return new Promise((resolve,reject)=>{
+          const url=URL.createObjectURL(file),img=new Image();
+          img.onload=()=>{
+            const canvas=document.createElement('canvas');canvas.width=512;canvas.height=512;
+            const ctx=canvas.getContext('2d');ctx.clearRect(0,0,512,512);
+            const scale=Math.min(512/img.width,512/img.height),w=img.width*scale,h=img.height*scale;
+            ctx.drawImage(img,(512-w)/2,(512-h)/2,w,h);
+            URL.revokeObjectURL(url);
+            canvas.toBlob(b=>b?resolve(b):reject(new Error('Konversi gagal')),'image/webp',.90);
+          };
+          img.onerror=()=>{URL.revokeObjectURL(url);reject(new Error('Gambar tidak valid'));};
+          img.src=url;
+        });
+      }
+      async function getItem(id){return allStickers.find(x=>x.id===id);}
+      $('stickerGrid').addEventListener('click',async e=>{
+        const share=e.target.closest('[data-share]'),download=e.target.closest('[data-download]'),del=e.target.closest('[data-delete]');
+        const id=(share||download||del)?.dataset.share||(share||download||del)?.dataset.download||(share||download||del)?.dataset.delete;
+        if(!id)return;
+        const item=await getItem(id);if(!item)return;
+        const file=new File([item.blob],item.name.replace(/[^a-z0-9_-]/gi,'_')+'.webp',{type:'image/webp'});
+        if(share){
+          try{
+            if(navigator.share&&(!navigator.canShare||navigator.canShare({files:[file]}))){
+              await navigator.share({title:item.name,files:[file]});
+            }else{
+              const url=URL.createObjectURL(item.blob),a=document.createElement('a');a.href=url;a.download=file.name;a.click();setTimeout(()=>URL.revokeObjectURL(url),1500);
+              alert('Browser belum mendukung berbagi file. Stiker diunduh; silakan bagikan melalui WhatsApp.');
+            }
+          }catch(err){if(err.name!=='AbortError')alert('Tidak dapat membuka menu berbagi. Coba gunakan Download.');}
+        }else if(download){
+          const url=URL.createObjectURL(item.blob),a=document.createElement('a');a.href=url;a.download=file.name;a.click();setTimeout(()=>URL.revokeObjectURL(url),1500);
+        }else if(del&&isAdmin){
+          if(confirm('Hapus stiker '+item.name+'?')){await remove(id);await render();}
+        }
+      });
+      openDB().then(render).catch(err=>console.error('Sticker DB:',err));
+    })();
+    </script>
+    <!-- Script Kontrol Menu & Modal Bot Config -->
+    <script>
+    document.addEventListener('DOMContentLoaded', function () {
+        if (window.lucide) window.lucide.createIcons();
+        
+        const menuBtn = document.getElementById('menuBtn');
+        const dropdown = document.getElementById('menuDropdown');
+        const updateModal = document.getElementById('updateModal');
+        const openUpdateBtn = document.getElementById('openUpdateBtn');
+        const closeUpdateBtn = document.getElementById('closeUpdateBtn');
+        const dashboardPage = document.getElementById('beranda');
+        const premiumPage = document.getElementById('premiumPage');
+        const premiumBackBtn = document.getElementById('premiumBackBtn');
+
+        // Modal Konfigurasi Bot
+        const botConfigModal = document.getElementById('botConfigModal');
+        const openBotConfigBtn = document.getElementById('openBotConfigBtn');
+        const closeBotConfigBtn = document.getElementById('closeBotConfigBtn');
+        const botConfigForm = document.getElementById('botConfigForm');
+
+        if(openBotConfigBtn) {
+            openBotConfigBtn.addEventListener('click', function() {
+                botConfigModal.classList.remove('hidden');
+            });
+        }
+        if(closeBotConfigBtn) {
+            closeBotConfigBtn.addEventListener('click', function() {
+                botConfigModal.classList.add('hidden');
+            });
+        }
+        if(botConfigModal) {
+            botConfigModal.addEventListener('click', function(e) {
+                if (e.target === botConfigModal) {
+                    botConfigModal.classList.add('hidden');
+                }
+            });
+        }
+        if(botConfigForm) {
+            botConfigForm.addEventListener('submit', function(e) {
+                e.preventDefault();
+                const botName = document.getElementById('botNameInput').value;
+                const senderName = document.getElementById('senderNameInput').value;
+                const countryCode = document.getElementById('countryCodeSelect').value;
+                const waNum = document.getElementById('whatsappNumInput').value;
+                
+                const waText = encodeURIComponent(`Halo Admin, saya ingin mengajukan Verifikasi & Penautan Bot WhatsApp:\n\n• Nama Bot: ${botName}\n• Nama Pengirim: ${senderName}\n• Nomor WhatsApp: +${countryCode}${waNum}`);
+                window.open(`https://wa.me/6285706859846?text=${waText}`, '_blank');
+            });
+        }
+
+        function openPremiumPage(event) {
+            if (event) event.preventDefault();
+            dashboardPage.classList.add('hidden');
+            premiumPage.classList.remove('hidden');
+            dropdown.classList.add('hidden');
+            menuBtn.setAttribute('aria-expanded', 'false');
+            window.scrollTo({ top: 0, behavior: 'auto' });
+            history.replaceState(null, '', '#premium');
+            if (window.lucide) window.lucide.createIcons();
+        }
+        function openDashboardPage(event, target) {
+            if (event) event.preventDefault();
+            premiumPage.classList.add('hidden');
+            dashboardPage.classList.remove('hidden');
+            dropdown.classList.add('hidden');
+            menuBtn.setAttribute('aria-expanded', 'false');
+            history.replaceState(null, '', target || '#beranda');
+            requestAnimationFrame(function () {
+                if (target && target !== '#beranda') {
+                    const section = document.querySelector(target);
+                    if (section) section.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                } else {
+                    window.scrollTo({ top: 0, behavior: 'smooth' });
+                }
+            });
+        }
+        document.querySelectorAll('a[href="#premium"]').forEach(function (link) {
+            link.addEventListener('click', openPremiumPage);
+        });
+        document.querySelectorAll('a[href="#beranda"]').forEach(function (link) {
+            link.addEventListener('click', function (event) { openDashboardPage(event, '#beranda'); });
+        });
+        document.querySelectorAll('a[href="#ringkasan"], a[href="#fitur"], a[href="#panduan"], a[href="#faq"]').forEach(function (link) {
+            link.addEventListener('click', function (event) { openDashboardPage(event, link.getAttribute('href')); });
+        });
+        if (premiumBackBtn) premiumBackBtn.addEventListener('click', function (event) { openDashboardPage(event, '#beranda'); });
+        if (window.location.hash === '#premium') {
+            dashboardPage.classList.add('hidden');
+            premiumPage.classList.remove('hidden');
+        }
+
+        // Toggle dropdown menu
+        menuBtn.addEventListener('click', function () {
+            const opening = dropdown.classList.contains('hidden');
+            dropdown.classList.toggle('hidden');
+            menuBtn.setAttribute('aria-expanded', String(opening));
+        });
+
+        // Buka Pop-up Log Pembaruan dari menu detail
+        openUpdateBtn.addEventListener('click', function () {
+            dropdown.classList.add('hidden');
+            menuBtn.setAttribute('aria-expanded', 'false');
+            updateModal.classList.remove('hidden');
+        });
+
+        // Tutup Pop-up Log Pembaruan
+        closeUpdateBtn.addEventListener('click', function () {
+            updateModal.classList.add('hidden');
+        });
+
+        // Tutup modal jika mengklik area luar modal
+        updateModal.addEventListener('click', function (e) {
+            if (e.target === updateModal) {
+                updateModal.classList.add('hidden');
+            }
+        });
+
+        // Tutup menu jika mengklik di luar menu
+        dropdown.querySelectorAll('a').forEach(function (link) {
+            link.addEventListener('click', function () {
+                dropdown.classList.add('hidden');
+                menuBtn.setAttribute('aria-expanded', 'false');
+            });
+        });
+        document.addEventListener('click', function (event) {
+            if (!dropdown.contains(event.target) && !menuBtn.contains(event.target) && !updateModal.contains(event.target)) {
+                dropdown.classList.add('hidden');
+                menuBtn.setAttribute('aria-expanded', 'false');
+            }
+        });
+
+        const premiumOwnerWhatsApp = '6285922231984';
+        document.querySelectorAll('.premium-buy-btn').forEach(function (button) {
+            button.addEventListener('click', function () {
+                const selectedPlan = button.dataset.plan || 'Paket Premium';
+                const orderMessage = [
+                    'Halo Owner Godspeed Bot, saya ingin memesan paket premium.',
+                    '',
+                    'Paket: ' + selectedPlan,
+                    'Nama: ',
+                    'Nomor WhatsApp saya: ',
+                    '',
+                    'Mohon informasi langkah pembayaran dan aktivasi. Terima kasih.'
+                ].join('\n');
+
+                const whatsappUrl = 'https://wa.me/' + premiumOwnerWhatsApp +
+                    '?text=' + encodeURIComponent(orderMessage);
+
+                window.location.href = whatsappUrl;
+            });
+        });
+
+        const particleCanvas = document.getElementById('rainbowParticles');
+        if (particleCanvas) {
+            const ctx = particleCanvas.getContext('2d');
+            let particleW = 0, particleH = 0, particleDpr = 1;
+            const rainbowColors = ['#ff6b6b', '#ffad5a', '#ffe66d', '#7bed9f', '#55d6ff', '#7c9cff', '#c792ea', '#ff8bd1'];
+            const particles = [];
+            const particleCount = Math.min(125, Math.max(65, Math.floor(window.innerWidth / 10)));
+
+            function resizeParticleCanvas() {
+                particleDpr = Math.min(window.devicePixelRatio || 1, 2);
+                particleW = window.innerWidth;
+                particleH = window.innerHeight;
+                particleCanvas.width = Math.floor(particleW * particleDpr);
+                particleCanvas.height = Math.floor(particleH * particleDpr);
+                particleCanvas.style.width = particleW + 'px';
+                particleCanvas.style.height = particleH + 'px';
+                ctx.setTransform(particleDpr, 0, 0, particleDpr, 0, 0);
+            }
+
+            function newParticle(randomY) {
+                const kindRoll = Math.random();
+                // Hujan dibuat paling sering agar terlihat jelas, diselingi pasir,
+                // bintang kecil, dan daun warna-warni dari atas layar.
+                const kind = kindRoll < .42 ? 'rain'
+                    : (kindRoll < .72 ? 'sand'
+                    : (kindRoll < .88 ? 'star' : 'leaf'));
+                return {
+                    x: Math.random() * Math.max(1, particleW),
+                    y: randomY ? Math.random() * Math.max(1, particleH) : -12 - Math.random() * 60,
+                    kind,
+                    size: kind === 'rain' ? 9 + Math.random() * 13
+                        : (kind === 'sand' ? .8 + Math.random() * 1.7
+                        : (kind === 'star' ? 1.1 + Math.random() * 1.5 : 3 + Math.random() * 3)),
+                    color: kind === 'rain' ? '#a9d8ff' : rainbowColors[Math.floor(Math.random() * rainbowColors.length)],
+                    speed: kind === 'rain' ? 7 + Math.random() * 8
+                        : (kind === 'leaf' ? .45 + Math.random() * .75 : .65 + Math.random() * 1.35),
+                    drift: kind === 'rain' ? -1.1 - Math.random() * .8
+                        : ((Math.random() - .5) * (kind === 'leaf' ? .8 : .38)),
+                    sway: Math.random() * Math.PI * 2,
+                    spin: (Math.random() - .5) * .035,
+                    angle: Math.random() * Math.PI * 2,
+                    alpha: kind === 'rain' ? .22 + Math.random() * .30 : .35 + Math.random() * .55
+                };
+            }
+
+            resizeParticleCanvas();
+            for (let i = 0; i < particleCount; i++) particles.push(newParticle(true));
+            window.addEventListener('resize', resizeParticleCanvas, { passive: true });
+
+            function drawTinyStar(p) {
+                ctx.save();
+                ctx.translate(p.x, p.y);
+                ctx.rotate(p.angle);
+                ctx.globalAlpha = p.alpha;
+                ctx.fillStyle = p.color;
+                ctx.shadowColor = p.color;
+                ctx.shadowBlur = 7;
+                ctx.beginPath();
+                ctx.moveTo(0, -p.size * 1.8);
+                ctx.lineTo(p.size * .45, -p.size * .45);
+                ctx.lineTo(p.size * 1.8, 0);
+                ctx.lineTo(p.size * .45, p.size * .45);
+                ctx.lineTo(0, p.size * 1.8);
+                ctx.lineTo(-p.size * .45, p.size * .45);
+                ctx.lineTo(-p.size * 1.8, 0);
+                ctx.lineTo(-p.size * .45, -p.size * .45);
+                ctx.closePath();
+                ctx.fill();
+                ctx.restore();
+            }
+
+            function drawLeaf(p) {
+                ctx.save();
+                ctx.translate(p.x, p.y);
+                ctx.rotate(p.angle);
+                ctx.globalAlpha = p.alpha;
+                ctx.fillStyle = p.color;
+                ctx.shadowColor = p.color;
+                ctx.shadowBlur = 5;
+                ctx.beginPath();
+                ctx.moveTo(0, -p.size * 1.8);
+                ctx.quadraticCurveTo(p.size * 1.7, -p.size * .7, 0, p.size * 1.8);
+                ctx.quadraticCurveTo(-p.size * 1.7, -p.size * .7, 0, -p.size * 1.8);
+                ctx.fill();
+                ctx.strokeStyle = 'rgba(255,255,255,.45)';
+                ctx.lineWidth = .55;
+                ctx.beginPath();
+                ctx.moveTo(0, -p.size * 1.35);
+                ctx.lineTo(0, p.size * 1.35);
+                ctx.stroke();
+                ctx.restore();
+            }
+
+            let lastParticleFrame = 0;
+            function animateRainbowParticles(timestamp) {
+                if (timestamp - lastParticleFrame < 28) {
+                    requestAnimationFrame(animateRainbowParticles);
+                    return;
+                }
+                lastParticleFrame = timestamp;
+                ctx.clearRect(0, 0, particleW, particleH);
+
+                for (const p of particles) {
+                    p.sway += .018;
+                    p.x += p.drift + Math.sin(p.sway) * (p.kind === 'leaf' ? .45 : .16);
+                    p.y += p.speed;
+                    p.angle += p.spin;
+
+                    if (p.kind === 'rain') {
+                        // Garis hujan miring tipis dengan warna biru lembut.
+                        ctx.save();
+                        ctx.globalAlpha = p.alpha;
+                        ctx.strokeStyle = p.color;
+                        ctx.lineWidth = .8;
+                        ctx.lineCap = 'round';
+                        ctx.shadowColor = p.color;
+                        ctx.shadowBlur = 3;
+                        ctx.beginPath();
+                        ctx.moveTo(p.x, p.y);
+                        ctx.lineTo(p.x - 3.5, p.y + p.size);
+                        ctx.stroke();
+                        ctx.restore();
+                    } else if (p.kind === 'sand') {
+                        ctx.globalAlpha = p.alpha;
+                        ctx.fillStyle = p.color;
+                        ctx.shadowColor = p.color;
+                        ctx.shadowBlur = 5;
+                        ctx.beginPath();
+                        ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+                        ctx.fill();
+                    } else if (p.kind === 'star') {
+                        drawTinyStar(p);
+                    } else {
+                        drawLeaf(p);
+                    }
+
+                    if (p.y > particleH + 15 || p.x < -20 || p.x > particleW + 20) {
+                        Object.assign(p, newParticle(false));
+                    }
+                }
+                ctx.globalAlpha = 1;
+                ctx.shadowBlur = 0;
+                requestAnimationFrame(animateRainbowParticles);
+            }
+
+            if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+                requestAnimationFrame(animateRainbowParticles);
+            } else {
+                ctx.clearRect(0, 0, particleW, particleH);
+            }
+        }
+
+        // Bintang jatuh background
+        const stars = document.getElementById('starsContainer');
+        for (let i = 0; i < 34; i++) {
+            const star = document.createElement('span');
+            star.className = 'star';
+            star.style.left = Math.random() * 100 + '%';
+            star.style.width = star.style.height = (Math.random() * 2 + 1) + 'px';
+            star.style.opacity = String(Math.random() * .5 + .15);
+            star.style.animationDuration = (Math.random() * 8 + 6) + 's';
+            star.style.animationDelay = (Math.random() * 8) + 's';
+            stars.appendChild(star);
+        }
+    });
+    </script>
+<script>
+(function(){
+  const KEY='godspeedFootballSnapshotV1';
+  const enabledKey='godspeedFootballNotificationsEnabled';
+  const statusEl=document.getElementById('footballNotifyStatus');
+  const enableBtn=document.getElementById('enableFootballNotifications');
+  if(!enableBtn || enableBtn.dataset.bound) return;
+  enableBtn.dataset.bound='1';
+  function status(t){if(statusEl) statusEl.textContent=t;}
+  enableBtn.addEventListener('click', async function(){
+    if(!('Notification' in window)){status('Browser tidak mendukung notifikasi');return;}
+    const permission=await Notification.requestPermission();
+    if(permission==='granted'){
+      localStorage.setItem(enabledKey,'1'); status('Aktif • izin diberikan');
+      new Notification('Godspeed Bot • Bola',{body:'Pemberitahuan pertandingan telah diaktifkan.'});
+      checkFootballUpdates();
+    } else status('Izin notifikasi belum diberikan');
+  });
+  if(localStorage.getItem(enabledKey)==='1' && 'Notification' in window && Notification.permission==='granted') status('Aktif • menunggu pembaruan');
+
+  // Endpoint dapat diisi dengan backend/API jadwal bola milik pengelola.
+  // Format JSON yang diharapkan: { matches: [{id, home, away, league, kickoff, status, score, tv, source}] }
+  const FOOTBALL_API_URL='';
+  function notify(title,body,tag){
+    if(localStorage.getItem(enabledKey)==='1' && Notification.permission==='granted') new Notification(title,{body,tag});
+  }
+  async function checkFootballUpdates(){
+    if(!FOOTBALL_API_URL){status(localStorage.getItem(enabledKey)==='1'?'Aktif • API jadwal belum dihubungkan':'Belum diaktifkan');return;}
+    try{
+      const res=await fetch(FOOTBALL_API_URL,{cache:'no-store'}); if(!res.ok) throw new Error('API gagal');
+      const data=await res.json(); const matches=Array.isArray(data.matches)?data.matches:[];
+      const old=JSON.parse(localStorage.getItem(KEY)||'{}'); const next={};
+      for(const m of matches){
+        if(!m.id || !m.home || !m.away || !m.kickoff) continue;
+        const signature=[m.kickoff,m.status,m.score,m.tv].join('|'); next[m.id]=signature;
+        if(old[m.id] && old[m.id]!==signature){
+          notify('Pembaruan pertandingan',`${m.home} vs ${m.away} • ${m.league||'Sepak bola'} • ${m.score||m.status||'Jadwal berubah'}`,`football-${m.id}-${signature}`);
+        } else if(!old[m.id]) {
+          notify('Jadwal pertandingan baru',`${m.home} vs ${m.away} • ${m.league||'Sepak bola'} • ${new Date(m.kickoff).toLocaleString('id-ID',{timeZone:'Asia/Jakarta'})} WIB`,`football-new-${m.id}`);
+        }
+        const kick=new Date(m.kickoff).getTime();
+        const reminderKey='godspeedReminder_'+m.id;
+        if(m.status==='scheduled' && kick>Date.now() && kick-Date.now()<=15*60*1000 && kick-Date.now()>0 && !localStorage.getItem(reminderKey)){
+          notify('Pertandingan segera dimulai',`${m.home} vs ${m.away} dimulai sekitar 15 menit lagi.`, `football-reminder-${m.id}`);
+          localStorage.setItem(reminderKey,'1');
+        }
+      }
+      localStorage.setItem(KEY,JSON.stringify(next)); status('Aktif • pemeriksaan terakhir berhasil');
+    }catch(e){status('API belum dapat diakses');}
+  }
+  if(localStorage.getItem(enabledKey)==='1' && 'Notification' in window && Notification.permission==='granted'){
+    checkFootballUpdates(); setInterval(checkFootballUpdates,5*60*1000);
+  }
+})();
+</script>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+<script>
+(function(){
+  'use strict';
+  const DB_NAME='GodspeedLibraryDB', STORE='books', DB_VERSION=1;
+  const $=id=>document.getElementById(id);
+  const modal=$('libraryModal'), reader=$('libraryReader');
+  let db=null, books=[], currentPdf=null, currentPage=1, currentBookId=null, renderTask=null;
+  const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+  function openDB(){
+    return new Promise((resolve,reject)=>{
+      const req=indexedDB.open(DB_NAME,DB_VERSION);
+      req.onupgradeneeded=()=>{const d=req.result;if(!d.objectStoreNames.contains(STORE))d.createObjectStore(STORE,{keyPath:'id'});};
+      req.onsuccess=()=>{db=req.result;resolve(db);};req.onerror=()=>reject(req.error);
+    });
+  }
+  function transaction(mode,action){
+    return new Promise((resolve,reject)=>{
+      const tx=db.transaction(STORE,mode), store=tx.objectStore(STORE);
+      let result;
+      const req=action(store);
+      if(req){req.onsuccess=()=>{result=req.result;};req.onerror=()=>reject(req.error);}
+      tx.oncomplete=()=>resolve(result);tx.onerror=()=>reject(tx.error);tx.onabort=()=>reject(tx.error);
+    });
+  }
+  async function loadBooks(){books=await transaction('readonly',s=>s.getAll());renderBooks();}
+  function renderBooks(){
+    $('libraryBookCount').textContent=books.length+' buku';
+    $('libraryEmpty').classList.toggle('hidden',books.length>0);
+    $('libraryBookGrid').innerHTML=books.map(b=>`
+      <article class="library-book">
+        <div class="library-cover"><div><div class="text-[9px] uppercase tracking-[.2em] opacity-70 mb-2">Godspeed Digital Library</div>${esc(b.title)}</div></div>
+        <div class="p-3 flex-1 flex flex-col gap-2">
+          <h4 class="text-xs font-extrabold text-white leading-snug break-words">${esc(b.title)}</h4>
+          <p class="library-muted">${(b.size/1024/1024).toFixed(1)} MB • PDF</p>
+          <button type="button" data-open-book="${esc(b.id)}" class="library-action w-full !bg-emerald-700 !border-emerald-600">📖 Baca Buku</button>
+          <div class="grid grid-cols-2 gap-2">
+            <button type="button" data-replace-book="${esc(b.id)}" class="library-action">Ganti PDF</button>
+            <button type="button" data-delete-book="${esc(b.id)}" class="library-action !text-red-300">Hapus</button>
+          </div>
+        </div>
+      </article>`).join('');
+  }
+  function openLibrary(){
+    modal.classList.add('open');modal.setAttribute('aria-hidden','false');document.body.style.overflow='hidden';
+    loadBooks().catch(()=>{$('libraryStorageStatus').textContent='Penyimpanan tidak tersedia';});
+  }
+  function closeLibrary(){
+    modal.classList.remove('open');modal.setAttribute('aria-hidden','true');
+    if(!reader.classList.contains('open'))document.body.style.overflow='';
+  }
+  $('openLibraryBtn').addEventListener('click',openLibrary);
+  $('libraryClose').addEventListener('click',closeLibrary);
+  modal.addEventListener('click',e=>{if(e.target===modal)closeLibrary();});
+  $('libraryUploadForm').addEventListener('submit',async e=>{
+    e.preventDefault();
+    const title=$('libraryBookTitle').value.trim(), file=$('libraryPdfFile').files[0];
+    if(!file)return;
+    if(file.type!=='application/pdf' && !file.name.toLowerCase().endsWith('.pdf')){alert('Pilih file PDF yang valid.');return;}
+    const submit=e.submitter; if(submit){submit.disabled=true;submit.textContent='Menyimpan...';}
+    try{
+      const id='book_'+title.toLocaleLowerCase('id-ID').replace(/[^a-z0-9]+/g,'_');
+      await transaction('readwrite',s=>s.put({id,title,blob:file,size:file.size,updatedAt:Date.now()}));
+      $('libraryUploadForm').reset();$('libraryStorageStatus').textContent='Buku berhasil disimpan di browser';
+      await loadBooks();
+    }catch(err){alert('Buku gagal disimpan. Ruang penyimpanan browser mungkin tidak cukup.');}
+    finally{if(submit){submit.disabled=false;submit.textContent='Simpan Buku';}}
+  });
+  $('libraryBookGrid').addEventListener('click',async e=>{
+    const open=e.target.closest('[data-open-book]'), del=e.target.closest('[data-delete-book]'), rep=e.target.closest('[data-replace-book]');
+    if(open){const b=books.find(x=>x.id===open.dataset.openBook);if(b)await openBook(b);return;}
+    if(del){const b=books.find(x=>x.id===del.dataset.deleteBook);if(b&&confirm('Hapus buku "'+b.title+'" dari perpustakaan?')){await transaction('readwrite',s=>s.delete(b.id));await loadBooks();}return;}
+    if(rep){const b=books.find(x=>x.id===rep.dataset.replaceBook);if(!b)return;$('libraryBookTitle').value=b.title;$('libraryPdfFile').click();}
+  });
+  // Bila tombol Ganti PDF dipakai, nama buku yang sedang dipilih dipertahankan.
+  $('libraryPdfFile').addEventListener('change',()=>{if($('libraryPdfFile').files.length && $('libraryBookTitle').value.trim())$('libraryUploadForm').requestSubmit();});
+  async function openBook(book){
+    if(!window.pdfjsLib){alert('Pembaca PDF belum termuat. Periksa koneksi internet lalu muat ulang halaman.');return;}
+    try{
+      $('readerLoading').classList.remove('hidden');
+      const bytes=await book.blob.arrayBuffer();
+      pdfjsLib.GlobalWorkerOptions.workerSrc='https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+      currentPdf=await pdfjsLib.getDocument({data:bytes}).promise;
+      currentBookId=book.id;currentPage=1;$('readerBookTitle').textContent=book.title;
+      reader.classList.add('open');reader.setAttribute('aria-hidden','false');document.body.style.overflow='hidden';
+      await renderPage(1);
+    }catch(err){alert('PDF tidak dapat dibuka. Pastikan file tidak rusak atau memiliki kata sandi.');}
+    finally{$('readerLoading').classList.add('hidden');}
+  }
+  async function renderPage(page){
+    if(!currentPdf)return;
+    currentPage=Math.max(1,Math.min(currentPdf.numPages,Number(page)||1));
+    $('readerPageNumber').value=currentPage;$('readerPageNumber').max=currentPdf.numPages;
+    $('readerPageInfo').textContent='Halaman '+currentPage+' dari '+currentPdf.numPages;
+    $('readerPrev').disabled=currentPage<=1;$('readerNext').disabled=currentPage>=currentPdf.numPages;
+    if(renderTask){try{renderTask.cancel();}catch(e){}}
+    const pdfPage=await currentPdf.getPage(currentPage), area=$('libraryPdfCanvas').parentElement;
+    const base=pdfPage.getViewport({scale:1}), scale=Math.min((area.clientWidth-30)/base.width,1.7);
+    const viewport=pdfPage.getViewport({scale:Math.max(.5,scale)});
+    const canvas=$('libraryPdfCanvas'),ctx=canvas.getContext('2d');
+    const ratio=window.devicePixelRatio||1;
+    canvas.width=Math.floor(viewport.width*ratio);canvas.height=Math.floor(viewport.height*ratio);
+    canvas.style.width=viewport.width+'px';canvas.style.height=viewport.height+'px';
+    renderTask=pdfPage.render({canvasContext:ctx,viewport,transform:ratio!==1?[ratio,0,0,ratio,0,0]:null});
+    try{await renderTask.promise;}catch(err){if(err.name!=='RenderingCancelledException')throw err;}
+  }
+  $('readerPrev').addEventListener('click',()=>renderPage(currentPage-1));
+  $('readerNext').addEventListener('click',()=>renderPage(currentPage+1));
+  $('readerPageNumber').addEventListener('change',()=>renderPage($('readerPageNumber').value));
+  $('readerBack').addEventListener('click',closeReader);
+  $('readerClose').addEventListener('click',closeReader);
+  function closeReader(){
+    reader.classList.remove('open');reader.setAttribute('aria-hidden','true');currentPdf=null;currentBookId=null;
+    document.body.style.overflow=modal.classList.contains('open')?'hidden':'';
+  }
+  document.addEventListener('keydown',e=>{
+    if(e.key==='Escape'){if(reader.classList.contains('open'))closeReader();else if(modal.classList.contains('open'))closeLibrary();}
+    if(reader.classList.contains('open') && e.key==='ArrowRight')renderPage(currentPage+1);
+    if(reader.classList.contains('open') && e.key==='ArrowLeft')renderPage(currentPage-1);
+  });
+  openDB().then(loadBooks).catch(()=>{$('libraryStorageStatus').textContent='Browser tidak mendukung penyimpanan buku';});
+})();
+</script>
+
+</body>
+</html>
